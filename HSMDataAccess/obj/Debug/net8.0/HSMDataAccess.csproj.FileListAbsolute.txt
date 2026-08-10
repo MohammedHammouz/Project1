@@ -1,0 +1,14 @@
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\bin\Debug\net8.0\HSMDataAccess.deps.json
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\bin\Debug\net8.0\HSMDataAccess.runtimeconfig.json
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\bin\Debug\net8.0\HSMDataAccess.dll
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\bin\Debug\net8.0\HSMDataAccess.pdb
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.csproj.AssemblyReference.cache
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.AssemblyInfoInputs.cache
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.AssemblyInfo.cs
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.csproj.CoreCompileInputs.cache
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.dll
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\refint\HSMDataAccess.dll
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.pdb
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\HSMDataAccess.genruntimeconfig.cache
+C:\Users\m7ama\OneDrive\Desktop\Project1\HSMDataAccess\obj\Debug\net8.0\ref\HSMDataAccess.dll

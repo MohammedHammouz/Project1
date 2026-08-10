@@ -1,0 +1,113 @@
+﻿using HSMDataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+namespace HSMDataAccess.Data
+{
+    public class AppDBContext:DbContext
+    {
+        
+        public AppDBContext(DbContextOptions<AppDBContext> options)
+           : base(options)
+        {
+        }
+        public virtual DbSet<Entities.UserEntity> Users { get; set; }
+        public virtual DbSet<Entities.DoctorEntity> Doctors { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Entities.UserEntity>(entity =>
+            {
+                entity.HasKey(e => e.UserID);
+                
+               
+                entity.ToTable(e =>
+                            e.HasCheckConstraint
+                            ("CK_Users_Role", "([Role]='Management' OR [Role]=' Accounts' OR [Role]='Nurse' OR [Role]='Doctor' OR [Role]='Admin')"));
+                entity.Property(e => e.UserID)
+                .ValueGeneratedOnAdd();
+                entity.Property(e => e.Role)
+                .HasMaxLength(10)
+                .HasColumnType("nvarchar(10)")
+                .IsRequired();
+
+
+                entity.Property(e => e.Status);
+                entity.Property(e => e.Password)
+                .HasMaxLength(10)
+                .HasColumnType("nchar(10)")
+                .IsRequired();
+                entity.Property(e => e.CreatedOn)
+              .HasColumnType("datetime")
+              .IsRequired();
+                entity.Property(e => e.UpdatedOn)
+              .HasColumnType("datetime");
+               
+                entity.Property(e => e.CreatedBy)
+              .HasMaxLength(10)
+              .HasColumnType("nchar(10)")
+              .IsRequired();
+                entity.Property(e => e.UpdatedBy)
+              .HasMaxLength(10)
+              .HasColumnType("nchar(10)");
+                entity.HasOne(u => u.Creator)
+                .WithMany(u => u.CreatedUsers)
+                .HasForeignKey(u => u.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(u => u.Updater)
+                .WithMany(u => u.UpdatedUsers)
+                .HasForeignKey(u => u.UpdatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<DoctorEntity>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+                entity.HasIndex(e => e.DepartmentID, "IX_Doctors_Departments");
+                
+                entity.ToTable(
+                    t=> {
+                        t
+                        .HasCheckConstraint
+                        ("CK_Doctors_Status", "([Status]='Inactive' OR [Status]='Active')");
+                    });
+                entity.Property(e => e.Specialization)
+                .HasColumnType("nvarchar(50)")
+                .IsRequired();
+                entity.Property(e => e.Status)
+                .HasColumnType("nchar(10)")
+                .IsRequired();
+                entity.Property(e => e.UserID)
+                .HasColumnType("nchar(10)")
+                .IsRequired();
+                entity.Property(e => e.CreatedOn)
+                .HasColumnType("nchar(10)")
+                .IsRequired();
+                entity.Property(e => e.UpdatedOn)
+                .HasColumnType("nchar(10)");
+                
+                entity.HasOne(d => d.Department)
+                .WithOne()
+                 .HasForeignKey<DoctorEntity>(d => d.DepartmentID)
+                 .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasOne(e => e.UserCreate)
+                 .WithMany()
+                 .HasForeignKey(e => e.CreatedBy)
+                 .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.UserUpdate)
+                 .WithMany()
+                 .HasForeignKey(e => e.UpdatedBy)
+                 .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(d => d.Employee)
+                .WithOne()
+                 .HasForeignKey<DoctorEntity>(d => d.UserID)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+    }
+}

@@ -1,0 +1,117 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMBusiness\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B2166DE1-38D1-EE60-5CAB-D320698E87DD}|HSMBusiness.csproj|c:\\users\\m7ama\\onedrive\\desktop\\project1\\hsmbusiness\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2166DE1-38D1-EE60-5CAB-D320698E87DD}|HSMBusiness.csproj|solutionrelative:user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{94315D34-62E0-DCC2-376D-FE33485FE6FD}|..\\HSMDataAccess\\HSMDataAccess.csproj|c:\\users\\m7ama\\onedrive\\desktop\\project1\\hsmdataaccess\\dtos\\doctordto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{94315D34-62E0-DCC2-376D-FE33485FE6FD}|..\\HSMDataAccess\\HSMDataAccess.csproj|c:\\users\\m7ama\\onedrive\\desktop\\project1\\hsmdataaccess\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{94315D34-62E0-DCC2-376D-FE33485FE6FD}|..\\HSMDataAccess\\HSMDataAccess.csproj|c:\\users\\m7ama\\onedrive\\desktop\\project1\\hsmdataaccess\\repositoryservices\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{94315D34-62E0-DCC2-376D-FE33485FE6FD}|..\\HSMDataAccess\\HSMDataAccess.csproj|c:\\users\\m7ama\\onedrive\\desktop\\project1\\hsmdataaccess\\entities\\userentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{94315D34-62E0-DCC2-376D-FE33485FE6FD}|..\\HSMDataAccess\\HSMDataAccess.csproj|c:\\users\\m7ama\\onedrive\\desktop\\project1\\hsmdataaccess\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserEntity.cs",
+              "DocumentMoniker": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\Entities\\UserEntity.cs",
+              "RelativeDocumentMoniker": "..\\HSMDataAccess\\Entities\\UserEntity.cs",
+              "ToolTip": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\Entities\\UserEntity.cs",
+              "RelativeToolTip": "..\\HSMDataAccess\\Entities\\UserEntity.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAYwAkAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-10T16:49:22.165Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DoctorDTO.cs",
+              "DocumentMoniker": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\DTOs\\DoctorDTO.cs",
+              "RelativeDocumentMoniker": "..\\HSMDataAccess\\DTOs\\DoctorDTO.cs",
+              "ToolTip": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\DTOs\\DoctorDTO.cs",
+              "RelativeToolTip": "..\\HSMDataAccess\\DTOs\\DoctorDTO.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAswAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-10T16:48:49.316Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\RepositoryServices\\UserRepository.cs",
+              "RelativeDocumentMoniker": "..\\HSMDataAccess\\RepositoryServices\\UserRepository.cs",
+              "ToolTip": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\RepositoryServices\\UserRepository.cs",
+              "RelativeToolTip": "..\\HSMDataAccess\\RepositoryServices\\UserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-10T16:45:47.317Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UserDTO.cs",
+              "DocumentMoniker": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\DTOs\\UserDTO.cs",
+              "RelativeDocumentMoniker": "..\\HSMDataAccess\\DTOs\\UserDTO.cs",
+              "ToolTip": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\DTOs\\UserDTO.cs",
+              "RelativeToolTip": "..\\HSMDataAccess\\DTOs\\UserDTO.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAkwCgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-10T16:29:39.79Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMBusiness\\User.cs",
+              "RelativeDocumentMoniker": "User.cs",
+              "ToolTip": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMBusiness\\User.cs",
+              "RelativeToolTip": "User.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAA6wDIAAABlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-10T16:03:10.761Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AppDBContext.cs",
+              "DocumentMoniker": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\Data\\AppDBContext.cs",
+              "RelativeDocumentMoniker": "..\\HSMDataAccess\\Data\\AppDBContext.cs",
+              "ToolTip": "C:\\Users\\m7ama\\OneDrive\\Desktop\\Project1\\HSMDataAccess\\Data\\AppDBContext.cs",
+              "RelativeToolTip": "..\\HSMDataAccess\\Data\\AppDBContext.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAA6wB4AAACVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-05T19:51:26.44Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
