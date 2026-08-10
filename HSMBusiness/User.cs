@@ -1,4 +1,5 @@
 ﻿using HSMDataAccess.Data;
+using HSMDataAccess.RepositoryServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HSMBusiness
@@ -28,12 +29,12 @@ namespace HSMBusiness
             this.UserID = user.UserID;
             this.Name = user.Name;
             this.Role = user.Role;
-           
+            _repository = repository;
             this.Status = user.Status;
             this.CreatedOn = user.CreatedOn;
             this.UpdatedOn = user.UpdatedOn;
 
-            _repository = repository;
+           
             Mode = enMode.Update;
     }
         private async Task<bool> _AddNew()
@@ -45,6 +46,15 @@ namespace HSMBusiness
         {
 
             return await _repository.UpdateUser(user);
+        }
+        public async Task<bool>Delete(string UserID)
+        {
+            var user =await _repository.GetUseByID(UserID);
+            if (user == null)
+            {
+                return false;
+            }
+            return await _repository.Delete(UserID);
         }
         public async Task<HSMDataAccess.DTOs.UserDTO> GetUseByID(string ID)
         {

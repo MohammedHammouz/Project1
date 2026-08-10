@@ -55,6 +55,14 @@ namespace HSMDataAccess.RepositoryServices
             int AffectedRows = await _context.SaveChangesAsync();
             return CurrentUser.UserID;
         }
+        public async Task<bool>Delete(string UserID)
+        {
+            var user = await _context.Users.FindAsync(UserID);
+            if (user == null)
+                return false;
+            _context.Users.Remove(user);
+            return await _context.SaveChangesAsync()>0;
+        }
         public async Task<bool> UpdateUser(DTOs.UserDTO NewUser)
         {
             var User =await _context.Users.FirstOrDefaultAsync(u => u.UserID == NewUser.UserID);

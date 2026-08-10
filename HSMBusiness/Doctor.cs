@@ -29,7 +29,7 @@ namespace HSMBusiness
         public enum enMode { Add=0,Update}
         public enMode mode = enMode.Add;
         private readonly DoctorRepository _doctor;
-        public Doctor(DoctorDTO doctorDTO,enMode mode=enMode.Add)
+        public Doctor(DoctorDTO doctorDTO, DoctorRepository doctor, enMode mode=enMode.Add)
         {
             this.ID = doctorDTO.ID;
             this.DepartmentID = doctorDTO.DepartmentID;
@@ -40,6 +40,7 @@ namespace HSMBusiness
             this.CreatedOn = doctorDTO.CreatedOn;
             this.UpdatedOn = doctorDTO.UpdatedOn;
             this.UserID = doctorDTO.UserID;
+            _doctor = doctor;
             mode = enMode.Update;
         }
         public async Task<DoctorDTO> GetDoctorByID(string DoctorID)
@@ -56,6 +57,10 @@ namespace HSMBusiness
         public async Task<bool> Delete(string DoctorID)
         {
             DoctorEntity doctor = await _doctor.GetByID(DoctorID);
+            if (doctor == null)
+            {
+                return false;
+            }
             return await _doctor.Delete(DoctorID);
         }
         private async Task<bool> Add()
