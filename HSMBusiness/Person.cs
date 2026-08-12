@@ -82,19 +82,12 @@ namespace HSMBusiness
         }
         public async Task<bool>Delete(string ID)
         {
-            var person = _personRepository.GetByIDAsync(ID);
+            PersonEntity person =await _personRepository.GetByIDAsync(ID);
             if (person == null)
             {
                 return false;
             }
-            PersonEntity personEntity = null;
-            personEntity.Name = personDTO.Name;
-            personEntity.ContactNumber = personDTO.ContactNumber;
-            personEntity.Email = personDTO.Email;
-            personEntity.Gender = personDTO.Gender;
-            personEntity.Address = personDTO.Address;
-            personEntity.DateOfBirth = personDTO.DateOfBirth;
-            return await _personRepository.DeleteAsync(personEntity);
+            return await _personRepository.DeleteAsync(person);
         }
         public async Task<PersonDTO>GetByID(string ID)
         {
