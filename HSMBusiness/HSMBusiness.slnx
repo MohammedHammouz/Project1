@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="../HSM/HSM.csproj" Id="50d587cf-276c-4568-ac2e-a24b5c46e5fb" />
   <Project Path="../HSMDataAccess/HSMDataAccess.csproj" />
   <Project Path="HSMBusiness.csproj" />
 </Solution>

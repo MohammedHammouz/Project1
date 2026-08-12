@@ -33,9 +33,7 @@ namespace HSMBusiness
             this.Status = user.Status;
             this.CreatedOn = user.CreatedOn;
             this.UpdatedOn = user.UpdatedOn;
-
-           
-            Mode = enMode.Update;
+            this.Mode = Mode;
     }
         private async Task<bool> _AddNew()
         {

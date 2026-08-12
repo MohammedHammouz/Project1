@@ -17,8 +17,9 @@ namespace HSMDataAccess.Data
            : base(options)
         {
         }
-        public virtual DbSet<Entities.UserEntity> Users { get; set; }
-        public virtual DbSet<Entities.DoctorEntity> Doctors { get; set; }
+        public virtual DbSet<UserEntity> Users { get; set; }
+        public virtual DbSet<DoctorEntity> Doctors { get; set; }
+        public virtual DbSet<PersonEntity> People { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Entities.UserEntity>(entity =>
@@ -66,6 +67,8 @@ namespace HSMDataAccess.Data
             });
             modelBuilder.Entity<DoctorEntity>(entity =>
             {
+                entity.Property(e => e.ID)
+                .ValueGeneratedOnAdd();
                 entity.HasKey(e => e.ID);
                 entity.HasIndex(e => e.DepartmentID, "IX_Doctors_Departments");
                 
@@ -77,18 +80,23 @@ namespace HSMDataAccess.Data
                     });
                 entity.Property(e => e.Specialization)
                 .HasColumnType("nvarchar(50)")
+                .HasMaxLength(50)
                 .IsRequired();
                 entity.Property(e => e.Status)
                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
                 .IsRequired();
                 entity.Property(e => e.UserID)
                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
                 .IsRequired();
                 entity.Property(e => e.CreatedOn)
                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
                 .IsRequired();
                 entity.Property(e => e.UpdatedOn)
-                .HasColumnType("nchar(10)");
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
                 
                 entity.HasOne(d => d.Department)
                 .WithOne()
@@ -107,6 +115,49 @@ namespace HSMDataAccess.Data
                 .WithOne()
                  .HasForeignKey<DoctorEntity>(d => d.UserID)
                  .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<PersonEntity>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+                entity.ToTable(
+                   t =>
+                   {
+                       t
+                       .HasCheckConstraint
+                       ("CK_People_Email", "([Email] like '%_@_%._%')");
+                   });
+                entity.ToTable(
+                  t =>
+                  {
+                      t
+                      .HasCheckConstraint
+                      ("CK_People_Gender", "([Gender]='Female' OR [Gender]='Male')");
+                  });
+                entity.ToTable(
+                  t =>
+                  {
+                      t
+                      .HasCheckConstraint
+                      ("CK_People_Name", "(len(Trim([Name]))>=(2))");
+                  });
+                entity.Property(e => e.ID)
+                .ValueGeneratedOnAdd();
+                entity.Property(e => e.Name)
+                .HasColumnType("nvarchar(200)")
+                .HasMaxLength(200);
+                entity.Property(e => e.ContactNumber)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
+                entity.Property(e => e.Email)
+                .HasColumnType("nvarchar(250)")
+                .HasMaxLength(250);
+                entity.Property(e => e.Gender)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
+                entity.Property(e => e.Address)
+               .HasColumnType("text");
+                entity.Property(e => e.DateOfBirth)
+              .HasColumnType("date");
             });
         }
     }

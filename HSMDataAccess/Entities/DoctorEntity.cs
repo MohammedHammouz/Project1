@@ -24,7 +24,7 @@ namespace HSMDataAccess.Entities
         
 
         // Navigation Properties
-        public virtual PeopleEntity People { get; set; } = null!;
+        public virtual PersonEntity People { get; set; } = null!;
         public virtual DepartmentEntity Department { get; set; } = null!;
         public virtual EmployeeEntity Employee { get; set; } = null!;
         public virtual UserEntity UserCreate { get; set; } = null!;

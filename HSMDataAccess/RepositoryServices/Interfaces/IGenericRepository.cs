@@ -8,7 +8,7 @@ namespace HSMDataAccess.RepositoryServices.Interfaces
 {
     public interface IGenericRepository<T> where T:class
     {
-        Task<T> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIDAsync(string ID);
         Task<string> AddAsync(T Entity);
         Task UpdateAsync(T Entity);

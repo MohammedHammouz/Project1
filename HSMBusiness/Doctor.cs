@@ -41,7 +41,7 @@ namespace HSMBusiness
             this.UpdatedOn = doctorDTO.UpdatedOn;
             this.UserID = doctorDTO.UserID;
             _doctor = doctor;
-            mode = enMode.Update;
+            this.mode = mode;
         }
         public async Task<DoctorDTO> GetDoctorByID(string DoctorID)
         {
