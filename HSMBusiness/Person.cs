@@ -98,12 +98,12 @@ namespace HSMBusiness
         }
         public async Task<PersonDTO>GetByID(string ID)
         {
-            var person = _personRepository.GetByIDAsync(ID);
+            PersonEntity person =await _personRepository.GetByIDAsync(ID);
             if (person == null)
             {
                 return null;
             }
-            return new PersonDTO(ID,Name, ContactNumber, personDTO.Email, Gender, Address, DateOfBirth);
+            return new PersonDTO(ID, person.Name, person.ContactNumber, person.Email, person.Gender, person.Address, person.DateOfBirth);
         }
         public async Task<bool> Save()
         {
