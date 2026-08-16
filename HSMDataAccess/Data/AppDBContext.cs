@@ -20,6 +20,7 @@ namespace HSMDataAccess.Data
         public virtual DbSet<UserEntity> Users { get; set; }
         public virtual DbSet<DoctorEntity> Doctors { get; set; }
         public virtual DbSet<PersonEntity> People { get; set; }
+        public virtual DbSet<PatientEntity> Patients { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Entities.UserEntity>(entity =>
@@ -158,6 +159,32 @@ namespace HSMDataAccess.Data
                .HasColumnType("text");
                 entity.Property(e => e.DateOfBirth)
               .HasColumnType("date");
+            });
+            modelBuilder.Entity<PatientEntity>(entity =>
+            {
+                entity.HasKey(e => e.PatientID);
+                entity.ToTable(
+                   t =>
+                   {
+                       t
+                       .HasCheckConstraint
+                       ("CK_Patients_Status", "([Status]=(1) OR [Status]=(0))");
+                   });
+                
+                entity.Property(e => e.PatientID)
+                .ValueGeneratedOnAdd();
+                entity.Property(e => e.MedicalHistory)
+                .HasColumnType("text");
+                entity.Property(e => e.Status)
+                .HasColumnType("bit");
+                entity.Property(e => e.PersonID)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
+                entity.HasOne(d => d.Person)
+                 .WithOne()
+                  .HasForeignKey<PatientEntity>(d => d.PersonID)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  ;
             });
         }
     }

@@ -66,7 +66,6 @@ namespace HSMBusiness
             personEntity.Address = personDTO.Address;
             personEntity.DateOfBirth = personDTO.DateOfBirth;
             this.ID =await _personRepository.AddAsync(personEntity);
-            personEntity.ID = personDTO.ID;
             return this.ID != "";
         }
         private async Task<bool> _Update()
