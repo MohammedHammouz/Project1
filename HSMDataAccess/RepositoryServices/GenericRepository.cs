@@ -17,16 +17,12 @@ namespace HSMDataAccess.RepositoryServices
         {
             _context = context;
         }
-        public async Task<string> AddAsync(T entity)
+        public async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
-            var idProperty = entity.GetType().GetProperty("Id");
-            if (idProperty != null && idProperty.PropertyType == typeof(string))
-            {
-                return (string)idProperty.GetValue(entity)!;
-            }
-            return "";
+
+            return entity;
         }
         public async Task<bool> DeleteAsync(T entity)
         {

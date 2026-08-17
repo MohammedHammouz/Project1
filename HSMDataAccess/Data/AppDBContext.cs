@@ -21,6 +21,8 @@ namespace HSMDataAccess.Data
         public virtual DbSet<DoctorEntity> Doctors { get; set; }
         public virtual DbSet<PersonEntity> People { get; set; }
         public virtual DbSet<PatientEntity> Patients { get; set; }
+        public virtual DbSet<EmployeeEntity> Employees { get; set; }
+        public virtual DbSet<ServicesCategoriesEntity> ServicesCategories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Entities.UserEntity>(entity =>
@@ -143,6 +145,33 @@ namespace HSMDataAccess.Data
                   .HasForeignKey<PatientEntity>(d => d.PersonID)
                   .OnDelete(DeleteBehavior.Restrict)
                   ;
+            });
+            modelBuilder.Entity<EmployeeEntity>(entity =>
+            {
+                entity.HasKey(e => e.EmployeeID);
+                entity.Property(e => e.Salary)
+                .HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.HireDate);
+                entity.Property(e => e.PersonID)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
+                entity.Property(e => e.IsActive)
+                .HasColumnType("bit");
+                entity.HasOne(d => d.Person)
+                 .WithOne()
+                  .HasForeignKey<PatientEntity>(d => d.PersonID)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<ServicesCategoriesEntity>(entity =>
+            {
+                entity.HasKey(e => e.CategoryID);
+                entity.HasIndex(e => e.CategoryName, "UQ__Service__CategoryName")
+                .IsUnique();
+                entity.Property(e => e.CategoryName)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
+                entity.Property(e => e.CategoryDescription)
+                .HasColumnType("text");
             });
         }
     }

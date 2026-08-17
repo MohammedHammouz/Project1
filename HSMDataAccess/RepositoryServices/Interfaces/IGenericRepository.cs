@@ -10,9 +10,9 @@ namespace HSMDataAccess.RepositoryServices.Interfaces
     {
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIDAsync(string ID);
-        Task<string> AddAsync(T Entity);
-        Task UpdateAsync(T Entity);
-        Task DeleteAsync(T Entity);
+        Task<T> AddAsync(T Entity);
+        Task<bool> UpdateAsync(T Entity);
+        Task<bool> DeleteAsync(T Entity);
    
     }
 }

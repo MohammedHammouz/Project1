@@ -53,7 +53,8 @@ namespace HSMBusiness
             patientEntity.PersonID = patientDTO.PersonID;
             patientEntity.Status = patientDTO.Status;
             patientEntity.MedicalHistory = patientDTO.MedicalHistory;
-            this.PatientID = await _patientRepository.AddAsync(patientEntity);
+            var NewPatient = await _patientRepository.AddAsync(patientEntity);
+            this.PatientID = NewPatient.PatientID;
             return this.PatientID != "";
         }
         private async Task<bool> _Update()

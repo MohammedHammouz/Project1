@@ -58,14 +58,15 @@ namespace HSMBusiness
         }
         private async Task<bool> _Add()
         {
-            PersonEntity personEntity = null;
+            PersonEntity personEntity = new PersonEntity();
             personEntity.Name = personDTO.Name;
             personEntity.ContactNumber = personDTO.ContactNumber;
             personEntity.Email = personDTO.Email;
             personEntity.Gender = personDTO.Gender;
             personEntity.Address = personDTO.Address;
             personEntity.DateOfBirth = personDTO.DateOfBirth;
-            this.ID =await _personRepository.AddAsync(personEntity);
+            var person = await _personRepository.AddAsync(personEntity);
+            this.ID =person.ID;
             return this.ID != "";
         }
         private async Task<bool> _Update()

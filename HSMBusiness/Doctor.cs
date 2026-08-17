@@ -61,18 +61,18 @@ namespace HSMBusiness
         }
         private async Task<bool> Add()
         {
-            DoctorEntity? doctorEntity = null;
+            DoctorEntity? doctorEntity = new DoctorEntity();
             doctorEntity.UserID = doctorDTO.UserID;
             doctorEntity.DepartmentID = doctorDTO.DepartmentID;
             doctorEntity.Specialization = doctorEntity.Specialization;
             doctorEntity.Status = doctorEntity.Status;
-
-            this.ID = await _doctor.AddAsync(doctorEntity);
+            var AddNew=await _doctor.AddAsync(doctorEntity);
+            this.ID = AddNew.ID;
             return this.ID!="";
         }
         private async Task<bool> Update()
         {
-            DoctorEntity? doctorEntity = null;
+            DoctorEntity? doctorEntity = new DoctorEntity();
             doctorEntity.UserID = doctorDTO.UserID;
             doctorEntity.DepartmentID = doctorDTO.DepartmentID;
             doctorEntity.Specialization = doctorEntity.Specialization;

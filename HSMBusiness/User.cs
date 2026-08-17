@@ -41,7 +41,6 @@ namespace HSMBusiness
         }
         private async Task<bool> _Update()
         {
-
             return await _repository.UpdateUser(user);
         }
         public async Task<bool>Delete(string UserID)

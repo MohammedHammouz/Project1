@@ -13,7 +13,7 @@ namespace HSMDataAccess.DTOs
         public string DepartmentID { get; set; } = null!;
         // Properties
         public string Specialization { get; set; } = null!;
-        public bool Status { get; set; };
+        public bool Status { get; set; }
         public string UserID { get; set; }
         public DoctorDTO(string id,string departmentID,string specialization,
         bool status,string UserID)
