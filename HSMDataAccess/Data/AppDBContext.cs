@@ -52,7 +52,7 @@ namespace HSMDataAccess.Data
                 .ValueGeneratedOnAdd();
                 entity.HasKey(e => e.ID);
                 entity.HasIndex(e => e.DepartmentID, "IX_Doctors_Departments");
-                
+                entity.HasIndex(e => e.UserID, "IX_Doctors_Users");
                 entity.ToTable(
                     t=> {
                         t
@@ -67,35 +67,13 @@ namespace HSMDataAccess.Data
                 .HasColumnType("nchar(10)")
                 .HasMaxLength(10)
                 .IsRequired();
-                entity.Property(e => e.UserID)
-                .HasColumnType("nchar(10)")
-                .HasMaxLength(10)
-                .IsRequired();
-                entity.Property(e => e.CreatedOn)
-                .HasColumnType("nchar(10)")
-                .HasMaxLength(10)
-                .IsRequired();
-                entity.Property(e => e.UpdatedOn)
-                .HasColumnType("nchar(10)")
-                .HasMaxLength(10);
-                
                 entity.HasOne(d => d.Department)
                 .WithOne()
                  .HasForeignKey<DoctorEntity>(d => d.DepartmentID)
                  .OnDelete(DeleteBehavior.Restrict);
-                
-                entity.HasOne(e => e.UserCreate)
-                 .WithMany()
-                 .HasForeignKey(e => e.CreatedBy)
-                 .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(e => e.UserUpdate)
-                 .WithMany()
-                 .HasForeignKey(e => e.UpdatedBy)
-                 .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(d => d.Employee)
+                entity.HasOne(d => d.User)
                 .WithOne()
-                 .HasForeignKey<DoctorEntity>(d => d.UserID)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .HasForeignKey<DoctorEntity>(d => d.UserID);
             });
             modelBuilder.Entity<PersonEntity>(entity =>
             {

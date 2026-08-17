@@ -16,14 +16,14 @@ namespace HSMBusiness
         public string CreatedBy { get; set; } = null!;
         public string? UpdatedBy { get; set; }
         public string Specialization { get; set; } = null!;
-        public string Status { get; set; } = null!;
+        public bool Status { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public string UserID { get; set; } = null!;
         public DoctorDTO doctorDTO { 
             get {
-                return new DoctorDTO(ID, DepartmentID, CreatedBy, UpdatedBy,
-            Specialization, Status, CreatedOn, UpdatedOn,UserID);
+                return new DoctorDTO(ID, DepartmentID,
+            Specialization, Status,UserID);
             } 
         }
         public enum enMode { Add=0,Update}
@@ -33,44 +33,51 @@ namespace HSMBusiness
         {
             this.ID = doctorDTO.ID;
             this.DepartmentID = doctorDTO.DepartmentID;
-            this.CreatedBy = doctorDTO.CreatedBy;
-            this.UpdatedBy = doctorDTO.UpdatedBy;
             this.Specialization = doctorDTO.Specialization;
             this.Status = doctorDTO.Status;
-            this.CreatedOn = doctorDTO.CreatedOn;
-            this.UpdatedOn = doctorDTO.UpdatedOn;
+           
             this.UserID = doctorDTO.UserID;
             _doctor = doctor;
             this.mode = mode;
         }
         public async Task<DoctorDTO> GetDoctorByID(string DoctorID)
         {
-            DoctorEntity doctor =await _doctor.GetByID(DoctorID);
+            DoctorEntity doctor =await _doctor.GetByIDAsync(DoctorID);
             if (doctor == null)
             {
                 return null;
             }
-            return new DoctorDTO(DoctorID, doctor.DepartmentID, doctor.CreatedBy,
-                doctor.UpdatedBy, doctor.Specialization, doctor.Status, 
-                doctor.CreatedOn, doctor.UpdatedOn, doctor.UserID);
+            return new DoctorDTO(DoctorID, doctor.DepartmentID, doctor.Specialization, doctor.Status, 
+                 doctor.UserID);
         }
         public async Task<bool> Delete(string DoctorID)
         {
-            DoctorEntity doctor = await _doctor.GetByID(DoctorID);
+            DoctorEntity doctor = await _doctor.GetByIDAsync(DoctorID);
             if (doctor == null)
             {
                 return false;
             }
-            return await _doctor.Delete(DoctorID);
+            return await _doctor.DeleteAsync(doctor);
         }
         private async Task<bool> Add()
         {
-            this.ID = await _doctor.AddNew(doctorDTO);
+            DoctorEntity? doctorEntity = null;
+            doctorEntity.UserID = doctorDTO.UserID;
+            doctorEntity.DepartmentID = doctorDTO.DepartmentID;
+            doctorEntity.Specialization = doctorEntity.Specialization;
+            doctorEntity.Status = doctorEntity.Status;
+
+            this.ID = await _doctor.AddAsync(doctorEntity);
             return this.ID!="";
         }
         private async Task<bool> Update()
         {
-            return await _doctor.Update(doctorDTO, this.ID);
+            DoctorEntity? doctorEntity = null;
+            doctorEntity.UserID = doctorDTO.UserID;
+            doctorEntity.DepartmentID = doctorDTO.DepartmentID;
+            doctorEntity.Specialization = doctorEntity.Specialization;
+            doctorEntity.Status = doctorEntity.Status;
+            return await _doctor.UpdateAsync(doctorEntity);
         }
         public async Task<bool> Save()
         {
