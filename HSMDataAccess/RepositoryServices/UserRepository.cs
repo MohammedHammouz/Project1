@@ -25,9 +25,7 @@ namespace HSMDataAccess.RepositoryServices
                 UserID=u.UserID,
                 Name = u.Name,
                 Role = u.Role,
-                Status = u.Status,
-                CreatedOn = u.CreatedOn,
-                UpdatedOn = u.UpdatedOn,
+                Status = u.Status
             }).AsNoTracking().ToListAsync();
             return users;
         }
@@ -45,11 +43,8 @@ namespace HSMDataAccess.RepositoryServices
                 UserID = NewUser.UserID,
                 Name = NewUser.Name,
                 Role = NewUser.Role,
-               
                 Status = NewUser.Status,
-                CreatedOn = NewUser.CreatedOn,
-                UpdatedOn = NewUser.UpdatedOn,
-             
+                HashPassword=NewUser.PasswordHash
             };
             var user=await _context.Users.AddAsync(CurrentUser);
             int AffectedRows = await _context.SaveChangesAsync();
@@ -70,12 +65,10 @@ namespace HSMDataAccess.RepositoryServices
             {
                 return false;
             }
-           
             User.Name = NewUser.Name;
             User.Role = NewUser.Role;
             User.Status = NewUser.Status;
-            User.CreatedOn = NewUser.CreatedOn;
-            User.UpdatedOn = NewUser.UpdatedOn;
+            User.HashPassword = NewUser.PasswordHash;
             int RowsAffected =await _context.SaveChangesAsync();
             return RowsAffected > 0;
         }

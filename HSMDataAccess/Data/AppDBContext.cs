@@ -37,34 +37,14 @@ namespace HSMDataAccess.Data
                 .HasMaxLength(10)
                 .HasColumnType("nvarchar(10)")
                 .IsRequired();
-
-
                 entity.Property(e => e.Status);
-                entity.Property(e => e.Password)
+                entity.Property(e => e.HashPassword)
                 .HasMaxLength(10)
                 .HasColumnType("nchar(10)")
                 .IsRequired();
-                entity.Property(e => e.CreatedOn)
-              .HasColumnType("datetime")
-              .IsRequired();
-                entity.Property(e => e.UpdatedOn)
-              .HasColumnType("datetime");
-               
-                entity.Property(e => e.CreatedBy)
-              .HasMaxLength(10)
-              .HasColumnType("nchar(10)")
-              .IsRequired();
-                entity.Property(e => e.UpdatedBy)
-              .HasMaxLength(10)
-              .HasColumnType("nchar(10)");
-                entity.HasOne(u => u.Creator)
-                .WithMany(u => u.CreatedUsers)
-                .HasForeignKey(u => u.CreatedBy)
-                .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(u => u.Updater)
-                .WithMany(u => u.UpdatedUsers)
-                .HasForeignKey(u => u.UpdatedBy)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(u => u.Employee)
+                  .WithOne()
+                  .HasForeignKey<UserEntity>(e => e.EmployeeID);
             });
             modelBuilder.Entity<DoctorEntity>(entity =>
             {
