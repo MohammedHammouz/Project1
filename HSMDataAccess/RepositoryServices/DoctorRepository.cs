@@ -11,10 +11,8 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.RepositoryServices
 {
-    public class DoctorRepository : GenericRepository<DoctorEntity>
+    public class DoctorRepository 
     {
-        public DoctorRepository(AppDBContext context) : base(context)
-        {
-        }
+        
     }
 }

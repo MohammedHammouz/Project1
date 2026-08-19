@@ -13,6 +13,6 @@ namespace HSMDataAccess.Entities
         public decimal Salary { get; set; }
         public DateTime HireDate { get; set; }
         public bool IsActive { get; set; }
-        public virtual PersonEntity Person { get; set; } = null;
+        public virtual PersonEntity Person { get; set; } = null!;
     }
 }

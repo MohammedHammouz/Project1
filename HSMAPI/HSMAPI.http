@@ -1,0 +1,6 @@
+@HSMAPI_HostAddress = http://localhost:5069
+
+GET {{HSMAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,4 +1,5 @@
-﻿using HSMDataAccess.DTOs;
+﻿using HSMBusiness.dto;
+using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
 using HSMDataAccess.RepositoryServices;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -15,36 +16,40 @@ namespace HSMBusiness
     public class Person
     {
         public string ID { get; set; } = null!;
-        public string? Name { get; set; }
-        public string? ContactNumber { get; set; }
-        public string? Email { get; set; }
-        public string? Gender { get; set; }
+        public string Name { get; set; } = null!;
+        public string ContactNumber { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Gender { get; set; } = null!;
         public string? Address { get; set; }
         public DateOnly DateOfBirth { get; set; }
+        private PersonDto _personDto;
         public PersonDTO personDTO { 
             get {
                 return new PersonDTO(ID, Name, ContactNumber,
                 Email, Gender, Address, DateOfBirth);
-            } 
+            }
+            set {
+                _personDto = new PersonDto(value.Name, value.ContactNumber, value.Email, value.Gender, value.Address, value.DateOfBirth);
+               
+            }
         }
+        
         private readonly PersonRepository _personRepository;
+        public PersonRepository personRepository1 { get { return _personRepository; } }
         public enum enMode { Add=0,Update}
         public enMode Mode = enMode.Add;
-        public Person(PersonDTO personDTO, PersonRepository personRepository, enMode Mode = enMode.Add)
+        public Person(PersonRepository personRepository, enMode Mode = enMode.Add)
         {
-            ID = personDTO.ID;
-            Name = personDTO.Name;
-            ContactNumber = personDTO.ContactNumber;
-            Email = personDTO.Email;
-            Gender = personDTO.Gender;
-            Address = personDTO.Address;
-            DateOfBirth = personDTO.DateOfBirth;
             _personRepository = personRepository;
             this.Mode = Mode;
         }
         public async  Task<List<PersonDTO>> GetAll()
         {
             var people = await _personRepository.GetAllAsync();
+            if (people == null)
+            {
+                return null;
+            }
             return people.Select(p => new PersonDTO(
             p.ID,
             p.Name,
@@ -56,9 +61,12 @@ namespace HSMBusiness
         ))
         .ToList();
         }
+        
+
         private async Task<bool> _Add()
         {
             PersonEntity personEntity = new PersonEntity();
+            personEntity.ID = Guid.NewGuid().ToString("N").Substring(0, 10);
             personEntity.Name = personDTO.Name;
             personEntity.ContactNumber = personDTO.ContactNumber;
             personEntity.Email = personDTO.Email;
@@ -71,7 +79,12 @@ namespace HSMBusiness
         }
         private async Task<bool> _Update()
         {
-            PersonEntity personEntity = null;
+            PersonEntity personEntity =
+        await _personRepository.GetByIDAsync(ID);
+
+            if (personEntity == null)
+                return false;
+            personEntity.ID = ID;
             personEntity.Name = personDTO.Name;
             personEntity.ContactNumber = personDTO.ContactNumber;
             personEntity.Email = personDTO.Email;

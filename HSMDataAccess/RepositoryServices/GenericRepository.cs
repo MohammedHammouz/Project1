@@ -37,9 +37,9 @@ namespace HSMDataAccess.RepositoryServices
             return entities;
         }
         
-        public async Task<T> GetByIDAsync(string id)
+        public async Task<T> GetByIDAsync(string ID)
         {
-            var entity = await _context.Set<T>().FirstOrDefaultAsync(e => EF.Property<string>(e, "Id") == id);
+            var entity = await _context.Set<T>().FirstOrDefaultAsync(e => EF.Property<string>(e, "ID") == ID);
             return entity;
         }
         public async Task<bool> UpdateAsync(T entity)

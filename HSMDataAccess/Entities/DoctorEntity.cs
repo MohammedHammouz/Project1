@@ -19,7 +19,7 @@ namespace HSMDataAccess.Entities
         // Navigation Properties
         public virtual DepartmentEntity Department { get; set; } = null!;
         
-        public virtual  ICollection <UserEntity> User { get; set; } = new List<UserEntity>();
+        public virtual  UserEntity User { get; set; } = null!;
       
 
     }
