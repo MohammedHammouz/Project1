@@ -17,6 +17,6 @@ namespace HSMDataAccess.Entities
         public string Address { get; set; } = null!;
         public DateOnly DateOfBirth{ get; set; }
         public virtual EmployeeEntity Employee { get; set; } = null!;
-        //public virtual PatientEntity Patient { get; set; } = null!;
+        public virtual PatientEntity Patient { get; set; } = null!;
     }
 }

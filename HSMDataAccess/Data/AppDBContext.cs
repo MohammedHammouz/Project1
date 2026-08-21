@@ -141,31 +141,31 @@ namespace HSMDataAccess.Data
                 entity.Property(e => e.DateOfBirth)
               .HasColumnType("date");
             });
-            //modelBuilder.Entity<PatientEntity>(entity =>
-            //{
-            //    entity.HasKey(e => e.PatientID);
-            //    entity.ToTable(
-            //       t =>
-            //       {
-            //           t
-            //           .HasCheckConstraint
-            //           ("CK_Patients_Status", "([Status]=(1) OR [Status]=(0))");
-            //       });
+            modelBuilder.Entity<PatientEntity>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+                entity.ToTable(
+                   t =>
+                   {
+                       t
+                       .HasCheckConstraint
+                       ("CK_Patients_Status", "([Status]=(1) OR [Status]=(0))");
+                   });
 
-            //    entity.Property(e => e.PatientID)
-            //    .ValueGeneratedOnAdd();
-            //    entity.Property(e => e.MedicalHistory)
-            //    .HasColumnType("text");
-            //    entity.Property(e => e.Status)
-            //    .HasColumnType("bit");
-            //    entity.Property(e => e.PersonID)
-            //    .HasMaxLength(10);
-            //    entity.HasOne(d => d.Person)
-            //     .WithOne(e=>e.Patient)
-            //      .HasForeignKey<PatientEntity>(d => d.PersonID)
-            //      .OnDelete(DeleteBehavior.Restrict)
-            //      ;
-            //});
+                entity.Property(e => e.ID)
+                .ValueGeneratedOnAdd();
+                entity.Property(e => e.MedicalHistory)
+                .HasColumnType("text");
+                entity.Property(e => e.Status)
+                .HasColumnType("bit");
+                entity.Property(e => e.PersonID)
+                .HasMaxLength(10);
+                entity.HasOne(d => d.Person)
+                 .WithOne(e => e.Patient)
+                  .HasForeignKey<PatientEntity>(d => d.PersonID)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  ;
+            });
             modelBuilder.Entity<EmployeeEntity>(entity =>
             {
                 entity.HasKey(e => e.ID);

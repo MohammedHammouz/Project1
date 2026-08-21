@@ -10,7 +10,7 @@ namespace HSMDataAccess.Entities
 {
     public class PatientEntity
     {
-        public string PatientID { get; set; } = null!;
+        public string ID { get; set; } = null!;
         public string MedicalHistory { get; set; } = null!;
         public bool Status { get; set; } = false;
         public string PersonID { get; set; } = null!;
