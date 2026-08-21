@@ -17,66 +17,84 @@ namespace HSMDataAccess.Data
            : base(options)
         {
         }
-        //public virtual DbSet<UserEntity> Users { get; set; }
-        //public virtual DbSet<DoctorEntity> Doctors { get; set; }
+        public virtual DbSet<UserEntity> Users { get; set; }
+        public virtual DbSet<DoctorEntity> Doctors { get; set; }
         public virtual DbSet<PersonEntity> People { get; set; }
         //public virtual DbSet<PatientEntity> Patients { get; set; }
-        //public virtual DbSet<EmployeeEntity> Employees { get; set; }
+        public virtual DbSet<EmployeeEntity> Employees { get; set; }
         //public virtual DbSet<ServicesCategoriesEntity> ServicesCategories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Entities.UserEntity>(entity =>
-            //{
-            //    entity.HasKey(e => e.UserID);
+            modelBuilder.Entity<Entities.UserEntity>(entity =>
+            {
+                entity.HasKey(e => e.UserID);
+
+
+                entity.ToTable(e =>
+                            e.HasCheckConstraint
+                            ("CK_Users_Role", "([Role]='Management' OR [Role]=' Accounts' OR [Role]='Nurse' OR [Role]='Doctor' OR [Role]='Admin')"));
+                entity.Property(e => e.UserID)
+                .ValueGeneratedOnAdd();
+                entity.Property(e => e.Role)
+                .HasMaxLength(10)
+                .HasColumnType("nvarchar(10)")
+                .IsRequired();
+                entity.Property(e => e.Status);
+                entity.Property(e => e.HashPassword)
+                .HasMaxLength(10)
+                .HasColumnType("nchar(10)")
+                .IsRequired();
+                entity.HasOne(u => u.Employee)
+                  .WithOne()
+                  .HasForeignKey<UserEntity>(e => e.EmployeeID);
+            });
+            modelBuilder.Entity<DoctorEntity>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+                entity.Property(e => e.ID)
+                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
+                .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')")
+                .ValueGeneratedOnAdd();
                 
-               
-            //    entity.ToTable(e =>
-            //                e.HasCheckConstraint
-            //                ("CK_Users_Role", "([Role]='Management' OR [Role]=' Accounts' OR [Role]='Nurse' OR [Role]='Doctor' OR [Role]='Admin')"));
-            //    entity.Property(e => e.UserID)
-            //    .ValueGeneratedOnAdd();
-            //    entity.Property(e => e.Role)
-            //    .HasMaxLength(10)
-            //    .HasColumnType("nvarchar(10)")
-            //    .IsRequired();
-            //    entity.Property(e => e.Status);
-            //    entity.Property(e => e.HashPassword)
-            //    .HasMaxLength(10)
-            //    .HasColumnType("nchar(10)")
-            //    .IsRequired();
-            //    entity.HasOne(u => u.Employee)
-            //      .WithOne()
-            //      .HasForeignKey<UserEntity>(e => e.EmployeeID);
-            //});
-            //modelBuilder.Entity<DoctorEntity>(entity =>
-            //{
-            //    entity.Property(e => e.ID)
-            //    .ValueGeneratedOnAdd();
-            //    entity.HasKey(e => e.ID);
-            //    entity.HasIndex(e => e.DepartmentID, "IX_Doctors_Departments");
-            //    entity.HasIndex(e => e.UserID, "IX_Doctors_Users");
-            //    entity.ToTable(
-            //        t=> {
-            //            t
-            //            .HasCheckConstraint
-            //            ("CK_Doctors_Status", "([Status]='Inactive' OR [Status]='Active')");
-            //        });
-            //    entity.Property(e => e.Specialization)
-            //    .HasColumnType("nvarchar(50)")
-            //    .HasMaxLength(50)
-            //    .IsRequired();
-            //    entity.Property(e => e.Status)
-            //    .HasColumnType("nchar(10)")
-            //    .HasMaxLength(10)
-            //    .IsRequired();
-            //    entity.HasOne(d => d.Department)
-            //    .WithOne()
-            //     .HasForeignKey<DoctorEntity>(d => d.DepartmentID)
-            //     .OnDelete(DeleteBehavior.Restrict);
-            //    entity.HasOne(d => d.User)
-            //    .WithOne()
-            //     .HasForeignKey<DoctorEntity>(d => d.UserID);
-            //});
+                entity.HasIndex(e => e.DepartmentID, "IX_Doctors_Departments");
+                entity.HasIndex(e => e.UserID, "IX_Doctors_Users");
+                entity.ToTable(
+                    t =>
+                    {
+                        t
+                        .HasCheckConstraint
+                        ("CK_Doctors_Status", "([Status]=0 OR [Status]=1)");
+                    });
+                entity.Property(e => e.Specialization)
+                .HasColumnType("nvarchar(50)")
+                .HasMaxLength(50)
+                .IsRequired();
+                entity.Property(e => e.Status)
+                .HasColumnType("bit")
+                .IsRequired();
+                entity.HasOne(d => d.Department)
+                .WithOne()
+                 .HasForeignKey<DoctorEntity>(d => d.DepartmentID)
+                 .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(d => d.User)
+                .WithOne()
+                 .HasForeignKey<DoctorEntity>(d => d.UserID);
+            });
+            modelBuilder.Entity<DepartmentEntity>(entity =>
+            {
+                entity.Property(e => e.ID)
+                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
+                .HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)")
+                .ValueGeneratedOnAdd();
+                entity.Property(e => e.Name)
+                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
+                entity.Property(e => e.HeadOf)
+                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
+            });
             modelBuilder.Entity<PersonEntity>(entity =>
             {
                 entity.HasKey(e => e.ID);
@@ -133,7 +151,7 @@ namespace HSMDataAccess.Data
             //           .HasCheckConstraint
             //           ("CK_Patients_Status", "([Status]=(1) OR [Status]=(0))");
             //       });
-                
+
             //    entity.Property(e => e.PatientID)
             //    .ValueGeneratedOnAdd();
             //    entity.Property(e => e.MedicalHistory)
@@ -148,23 +166,27 @@ namespace HSMDataAccess.Data
             //      .OnDelete(DeleteBehavior.Restrict)
             //      ;
             //});
-            //modelBuilder.Entity<EmployeeEntity>(entity =>
-            //{
-            //    entity.HasKey(e => e.EmployeeID);
-            //    entity.Property(e => e.Salary)
-            //    .HasColumnType("decimal(10, 2)");
-            //    entity.Property(e => e.HireDate);
-            //    entity.Property(e => e.PersonID)
-            //    .HasColumnType("nchar(10)")
-            //    .HasMaxLength(10);
-            //    entity.Property(e => e.IsActive)
-            //    .HasColumnType("bit");
-            //    entity.HasOne(d => d.Person)
-            //     .WithOne(e=>e.Employee)
-            //      .HasForeignKey<EmployeeEntity>(d => d.PersonID)
-            //      .OnDelete(DeleteBehavior.Restrict)
-            //      .HasConstraintName("FK_Employees_People");
-            //});
+            modelBuilder.Entity<EmployeeEntity>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+                entity.Property(e => e.Salary)
+                .HasColumnType("decimal(10, 2)")
+                .IsRequired();
+                entity.Property(e => e.HireDate)
+                .IsRequired();
+                entity.Property(e => e.PersonID)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
+                .IsRequired();
+                entity.Property(e => e.IsActive)
+                .HasColumnType("bit")
+                .IsRequired();
+                entity.HasOne(d => d.Person)
+                 .WithOne(e => e.Employee)
+                  .HasForeignKey<EmployeeEntity>(d => d.PersonID)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Employees_People");
+            });
             //modelBuilder.Entity<ServicesCategoriesEntity>(entity =>
             //{
             //    entity.HasKey(e => e.CategoryID);

@@ -22,14 +22,13 @@ namespace HSMBusiness
         public string Gender { get; set; } = null!;
         public string? Address { get; set; }
         public DateOnly DateOfBirth { get; set; }
-        private PersonDto _personDto;
+        private PersonMapper _personDto;
         public PersonDTO personDTO { 
             get {
-                return new PersonDTO(ID, Name, ContactNumber,
-                Email, Gender, Address, DateOfBirth);
+                return PersonMapper.ToDTO(this); ;
             }
             set {
-                _personDto = new PersonDto(value.Name, value.ContactNumber, value.Email, value.Gender, value.Address, value.DateOfBirth);
+               PersonMapper.FromDTO(value,this);
                
             }
         }
@@ -42,6 +41,11 @@ namespace HSMBusiness
         {
             _personRepository = personRepository;
             this.Mode = Mode;
+        }
+        public Person()
+        {
+           
+
         }
         public async  Task<List<PersonDTO>> GetAll()
         {
@@ -65,14 +69,7 @@ namespace HSMBusiness
 
         private async Task<bool> _Add()
         {
-            PersonEntity personEntity = new PersonEntity();
-            personEntity.ID = Guid.NewGuid().ToString("N").Substring(0, 10);
-            personEntity.Name = personDTO.Name;
-            personEntity.ContactNumber = personDTO.ContactNumber;
-            personEntity.Email = personDTO.Email;
-            personEntity.Gender = personDTO.Gender;
-            personEntity.Address = personDTO.Address;
-            personEntity.DateOfBirth = personDTO.DateOfBirth;
+            PersonEntity personEntity = PersonMapper.ToEntity(personDTO);
             var person = await _personRepository.AddAsync(personEntity);
             this.ID =person.ID;
             return this.ID != "";
@@ -84,13 +81,7 @@ namespace HSMBusiness
 
             if (personEntity == null)
                 return false;
-            personEntity.ID = ID;
-            personEntity.Name = personDTO.Name;
-            personEntity.ContactNumber = personDTO.ContactNumber;
-            personEntity.Email = personDTO.Email;
-            personEntity.Gender = personDTO.Gender;
-            personEntity.Address = personDTO.Address;
-            personEntity.DateOfBirth = personDTO.DateOfBirth;
+            personEntity = PersonMapper.ToEntity(personDTO);
             return await _personRepository.UpdateAsync(personEntity);
         }
         public async Task<bool>Delete(string ID)
