@@ -8,29 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HSMBusiness
+namespace HSMBusiness.Services
 {
-    public class Patient
+    public class PatientService
     {
-        public string PatientID { get; set; } = null!;
-        public string MedicalHistory { get; set; } = null!;
-        public bool Status { get; set; } = false;
-        public string PersonID { get; set; } = null!;
-        public PatientDTO patientDTO
-        {
-            get
-            {
-                return PatientMapper.ToDTO(this);
-            }
-            set
-            {
-                PatientMapper.LoadDTO(value, this);
-            }
-        }
+    
         private readonly PatientRepository _patientRepository;
         public enum enMode { Add, Update }
         public enMode _Mode = enMode.Add;
-        public Patient(PatientRepository patientRepository, enMode Mode = enMode.Add)
+        public PatientService(PatientRepository patientRepository, enMode Mode = enMode.Add)
         {
             
             _patientRepository = patientRepository;
@@ -55,24 +41,26 @@ namespace HSMBusiness
             }
             return new PatientDTO(patient.ID, patient.MedicalHistory, patient.Status, patient.PersonID);
         }
-        private async Task<bool> _AddNew()
+        private async Task<bool> _AddNew(PatientDTO patientDTO)
         {
-            PatientEntity? patientEntity = PatientMapper.ToEntity(patientDTO);
+            Patient? patientEntity = new PatientMapper().ToEntity(patientDTO);
             var NewPatient = await _patientRepository.AddAsync(patientEntity);
-            this.PatientID = NewPatient.ID;
-            return this.PatientID != "";
+            patientEntity.ID = NewPatient.ID;
+            return patientEntity.ID != "";
         }
-        private async Task<bool> _Update()
+        private async Task<bool> _Update(string ID)
         {
-            PatientEntity? patientEntity = PatientMapper.ToEntity(patientDTO);
+            Patient? patientEntity = await _patientRepository.GetByIDAsync(ID);
+            if (patientEntity == null)
+                return false;
             return await _patientRepository.UpdateAsync(patientEntity);
         }
-        public async Task<bool> Save()
+        public async Task<bool> Save(PatientDTO patientDTO=null,string ID="")
         {
             switch (_Mode)
             {
                 case enMode.Add:
-                    if (await _AddNew())
+                    if (await _AddNew(patientDTO))
                     {
                         _Mode = enMode.Update;
                         return true;
@@ -82,20 +70,18 @@ namespace HSMBusiness
                         return false;
                     }
                 case enMode.Update:
-                    return await _Update();
+                    return await _Update(ID);
             }
             return false;
         }
         public async Task<bool> Delete(string PatientID)
         {
-            PatientDTO patient = await GetByID(PatientID);
+            var patient = await _patientRepository.GetByIDAsync(PatientID);
             if (patient == null)
             {
                 return false;
             }
-            PatientEntity? patientEntity = PatientMapper.ToEntity(patientDTO);
-            patientEntity.ID = PatientID;
-            return await _patientRepository.DeleteAsync(patientEntity);
+            return await _patientRepository.DeleteAsync(patient);
         }
     }
 }

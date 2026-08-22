@@ -7,7 +7,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace HSMDataAccess.Entities
 {
-    public class PersonEntity
+    public class Person
     {
         public string ID { get; set; } = null!;
         public string Name { get; set; } = null!;
@@ -16,7 +16,7 @@ namespace HSMDataAccess.Entities
         public string Gender { get; set; } = null!;
         public string Address { get; set; } = null!;
         public DateOnly DateOfBirth{ get; set; }
-        public virtual EmployeeEntity Employee { get; set; } = null!;
-        public virtual PatientEntity Patient { get; set; } = null!;
+        public virtual Employee Employee { get; set; } = null!;
+        public virtual Patient Patient { get; set; } = null!;
     }
 }

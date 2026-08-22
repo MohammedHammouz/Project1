@@ -1,4 +1,5 @@
-﻿using HSMDataAccess.DTOs;
+﻿using HSMBusiness.Services;
+using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,13 @@ namespace HSMBusiness.Mappers
 {
     public class PatientMapper
     {
-        public static PatientDTO ToDTO(Patient patient)
+        public  PatientDTO ToDTO(Patient patient)
         {
-            return new PatientDTO(patient.PatientID, patient.MedicalHistory, patient.Status, patient.PersonID);
+            return new PatientDTO(patient.ID, patient.MedicalHistory, patient.Status, patient.PersonID);
         }
-        public static PatientEntity ToEntity(PatientDTO patientDTO)
+        public  Patient ToEntity(PatientDTO patientDTO)
         {
-            return new PatientEntity
+            return new Patient
             {
                 ID = patientDTO.ID,
                 MedicalHistory = patientDTO.MedicalHistory,
@@ -25,12 +26,6 @@ namespace HSMBusiness.Mappers
                 PersonID = patientDTO.PersonID
             };
         }
-        public static void LoadDTO(PatientDTO dto, Patient patient)
-        {
-            dto.ID = patient.PatientID;
-            dto.MedicalHistory = patient.MedicalHistory;
-            dto.Status = patient.Status;
-            dto.PersonID = patient.PersonID;
-        }
+       
     }
 }

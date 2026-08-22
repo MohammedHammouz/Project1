@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.RepositoryServices
 {
-    public class EmployeeRepository : GenericRepository<EmployeeEntity>
+    public class EmployeeRepository : GenericRepository<Employee>
     {
         public EmployeeRepository(AppDBContext context) : base(context)
         {
                         
         }
-        public async Task<EmployeeEntity> GetByID(int ID)
+        public async Task<Employee> GetByID(int ID)
         {
-            var entity = await _context.Set<EmployeeEntity>().FirstOrDefaultAsync(e => EF.Property<int>(e, "ID") == ID);
+            var entity = await _context.Set<Employee>().FirstOrDefaultAsync(e => EF.Property<int>(e, "ID") == ID);
             return entity;
         }
     }

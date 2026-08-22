@@ -12,7 +12,7 @@ namespace HSMBusiness.dto
 {
     public class DoctorMapper
     {  
-        public static DoctorDTO ToDTO(Doctor doctor)
+        public DoctorDTO ToDTO(Doctor doctor)
         {
             return new DoctorDTO(doctor.ID,
                  doctor.DepartmentID,
@@ -21,9 +21,9 @@ namespace HSMBusiness.dto
                     doctor.UserID
                 );
         }
-        public static DoctorEntity ToEntity(DoctorDTO doctorDTO)
+        public Doctor ToEntity(DoctorDTO doctorDTO)
         {
-            return new DoctorEntity
+            return new Doctor
             {
                 ID = doctorDTO.ID,
                 DepartmentID = doctorDTO.DepartmentID,
@@ -32,13 +32,6 @@ namespace HSMBusiness.dto
                 UserID = doctorDTO.UserID
             };
         }
-        public static void FromDTO(DoctorDTO dto, Doctor doctor)
-        {
-            doctor.ID = dto.ID;
-            doctor.DepartmentID = dto.DepartmentID;
-            doctor.Specialization = dto.Specialization;
-            doctor.Status = dto.Status;
-            doctor.UserID = dto.UserID;
-        }
+        
     }
 }

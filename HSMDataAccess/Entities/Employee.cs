@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.Entities
 {
-    public class EmployeeEntity
+    public class Employee
     {
         public int ID { get; set; }
         public string PersonID { get; set; } = null!;
         public decimal Salary { get; set; }
         public DateTime HireDate { get; set; }
         public bool IsActive { get; set; }
-        public virtual PersonEntity Person { get; set; } = null!;
+        public virtual Person Person { get; set; } = null!;
     }
 }

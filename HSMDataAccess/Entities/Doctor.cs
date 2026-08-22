@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.Entities
 {
-    public class DoctorEntity
+    public class Doctor
     {
         public string ID { get; set; } = null!;
         
@@ -18,9 +18,9 @@ namespace HSMDataAccess.Entities
        
 
         // Navigation Properties
-        public virtual DepartmentEntity Department { get; set; } = null!;
+        public virtual Department Department { get; set; } = null!;
         
-        public virtual  UserEntity User { get; set; } = null!;
+        public virtual  User User { get; set; } = null!;
       
 
     }

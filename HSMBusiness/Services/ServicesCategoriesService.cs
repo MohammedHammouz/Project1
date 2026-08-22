@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HSMBusiness
+namespace HSMBusiness.Services
 {
-    public class ServicesCategories
+    public class ServicesCategoriesService
     {
     //    public int CategoryID { get; set; }
     //    public string CategoryName { get; set; } = null!;

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.RepositoryServices
 {
-    public class PersonRepository:GenericRepository<PersonEntity>
+    public class PersonRepository:GenericRepository<Person>
     {
         public PersonRepository(AppDBContext context) : base(context)
         {

@@ -1,4 +1,5 @@
 using HSMBusiness;
+using HSMBusiness.Services;
 using HSMDataAccess.Data;
 using HSMDataAccess.DTOs;
 using HSMDataAccess.RepositoryServices;
@@ -26,7 +27,11 @@ namespace HSMAPI
             builder.Services.AddDbContext<AppDBContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddScoped<PersonRepository>();
-            builder.Services.AddScoped<Person>();
+            builder.Services.AddScoped<PersonService>();
+            builder.Services.AddScoped<DoctorRepository>();
+            builder.Services.AddScoped<DoctorService>();
+            builder.Services.AddScoped<EmployeeRepository>();
+            builder.Services.AddScoped<EmployeeService>();
             var app = builder.Build();
             
             // Configure the HTTP request pipeline.

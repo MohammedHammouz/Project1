@@ -1,4 +1,4 @@
-﻿using HSMBusiness;
+﻿using HSMBusiness.Services;
 using HSMDataAccess.DTOs;
 using HSMDataAccess.RepositoryServices;
 using Microsoft.AspNetCore.Authorization;
@@ -12,8 +12,8 @@ namespace HSMAPI.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        private readonly Person _person;
-        public PersonController(Person person)
+        private readonly PersonService _person;
+        public PersonController(PersonService person)
         {
             _person = person;
         }
@@ -60,7 +60,7 @@ namespace HSMAPI.Controllers
             }
             else
             {   
-                Person person = new Person(_person.personRepository1);
+                PersonService person = new PersonService(_person.personRepository1);
                 person.Name = newPerson.Name;
                 person.Address = newPerson.Address;
                 person.DateOfBirth = newPerson.DateOfBirth;
@@ -85,7 +85,7 @@ namespace HSMAPI.Controllers
                 return BadRequest("");
             }
             //var student = StudentDataSimulation.students.FirstOrDefault(student => student.studentID==id);
-            Person person = new Person(_person.personRepository1,Person.enMode.Update);
+            PersonService person = new PersonService(_person.personRepository1,PersonService.enMode.Update);
             PersonDTO person1 =await _person.GetByID(ID);
             if (person1 == null)
             {

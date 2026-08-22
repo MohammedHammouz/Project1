@@ -10,50 +10,42 @@ using System.Threading.Tasks;
 
 namespace HSMBusiness
 {
-    public class Doctor
+    public class DoctorService
     {
-        public string ID { get; set; } = null!;
-        public string DepartmentID { get; set; } = null!;
+        //public string ID { get; set; } = null!;
+        //public string DepartmentID { get; set; } = null!;
         
-        public string Specialization { get; set; } = null!;
-        public bool Status { get; set; }
+        //public string Specialization { get; set; } = null!;
+        //public bool Status { get; set; }
         
-        public string UserID { get; set; } = null!;
+        //public string UserID { get; set; } = null!;
        
         
-        public DoctorDTO doctorDTO
-        {
-            get
-            {
-                return DoctorMapper.ToDTO(this);
-            }
-            set
-            {
-                DoctorMapper.FromDTO(value, this);
-            }
+        //public DoctorDTO doctorDTO
+        //{
+        //    get
+        //    {
+        //        return DoctorMapper.ToDTO(this);
+        //    }
+        //    set
+        //    {
+        //        DoctorMapper.FromDTO(value, this);
+        //    }
            
-        }
+        //}
         public enum enMode { Add = 0, Update }
         public enMode mode = enMode.Add;
         private readonly DoctorRepository _doctor;
         public DoctorRepository doctorRepository { get { return _doctor; } }
-        public Doctor( DoctorRepository doctor, enMode mode = enMode.Add)
+        public DoctorService( DoctorRepository doctor, enMode mode = enMode.Add)
         {
             _doctor = doctor;
             this.mode = mode;
         }
-        private Doctor(string ID, string DepartmentID, string Specialization, bool Status, string UserID)
-        {
-            this.ID = ID;
-            this.DepartmentID = DepartmentID;
-            this.Specialization = Specialization;
-            this.Status = Status;
-            this.UserID = UserID;
-            
-        }
+        
         public async Task<DoctorDTO> GetDoctorByID(string DoctorID)
         {
-            DoctorEntity doctor = await _doctor.GetByIDAsync(DoctorID);
+            Doctor doctor = await _doctor.GetByIDAsync(DoctorID);
             if (doctor == null)
             {
                 return null;
@@ -63,7 +55,7 @@ namespace HSMBusiness
         }
         public async Task<bool> Delete(string DoctorID)
         {
-            DoctorEntity doctor = await _doctor.GetByIDAsync(DoctorID);
+            Doctor doctor = await _doctor.GetByIDAsync(DoctorID);
             if (doctor == null)
             {
                 return false;
@@ -80,24 +72,24 @@ namespace HSMBusiness
             return doctors.Select(d => new DoctorDTO(d.ID,d.DepartmentID,d.Specialization,d.Status,d.UserID))
         .ToList();
         }
-        private async Task<bool> Add()
+        private async Task<bool> Add(DoctorDTO doctorDTO)
         {
-            var doctorEntity = DoctorMapper.ToEntity(doctorDTO);
+            var doctorEntity = new DoctorMapper().ToEntity(doctorDTO);
             var AddNew = await _doctor.AddAsync(doctorEntity);
-            this.ID = AddNew.ID;
-            return this.ID != "";
+            doctorEntity.ID = AddNew.ID;
+            return doctorEntity.ID != "";
         }
-        private async Task<bool> Update()
+        private async Task<bool> Update(string ID)
         {
-            DoctorEntity? doctorEntity = DoctorMapper.ToEntity(doctorDTO);
+            Doctor? doctorEntity = await _doctor.GetByIDAsync(ID);
             return await _doctor.UpdateAsync(doctorEntity);
         }
-        public async Task<bool> Save()
+        public async Task<bool> Save(DoctorDTO doctorDTO=null,string ID="")
         {
             switch (mode)
             {
                 case enMode.Add:
-                    if (await Add())
+                    if (await Add(doctorDTO))
                     {
                         mode = enMode.Update;
                         return true;
@@ -107,7 +99,7 @@ namespace HSMBusiness
                         return false;
                     }
                 case enMode.Update:
-                    return await Update();
+                    return await Update(ID);
             }
             return false;
         }

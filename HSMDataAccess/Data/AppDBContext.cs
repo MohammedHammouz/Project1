@@ -17,15 +17,15 @@ namespace HSMDataAccess.Data
            : base(options)
         {
         }
-        public virtual DbSet<UserEntity> Users { get; set; }
-        public virtual DbSet<DoctorEntity> Doctors { get; set; }
-        public virtual DbSet<PersonEntity> People { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Doctor> Doctors { get; set; }
+        public virtual DbSet<Person> People { get; set; }
         //public virtual DbSet<PatientEntity> Patients { get; set; }
-        public virtual DbSet<EmployeeEntity> Employees { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
         //public virtual DbSet<ServicesCategoriesEntity> ServicesCategories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Entities.UserEntity>(entity =>
+            modelBuilder.Entity<Entities.User>(entity =>
             {
                 entity.HasKey(e => e.UserID);
 
@@ -46,9 +46,9 @@ namespace HSMDataAccess.Data
                 .IsRequired();
                 entity.HasOne(u => u.Employee)
                   .WithOne()
-                  .HasForeignKey<UserEntity>(e => e.EmployeeID);
+                  .HasForeignKey<User>(e => e.EmployeeID);
             });
-            modelBuilder.Entity<DoctorEntity>(entity =>
+            modelBuilder.Entity<Doctor>(entity =>
             {
                 entity.HasKey(e => e.ID);
                 entity.Property(e => e.ID)
@@ -75,13 +75,13 @@ namespace HSMDataAccess.Data
                 .IsRequired();
                 entity.HasOne(d => d.Department)
                 .WithOne()
-                 .HasForeignKey<DoctorEntity>(d => d.DepartmentID)
+                 .HasForeignKey<Doctor>(d => d.DepartmentID)
                  .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(d => d.User)
                 .WithOne()
-                 .HasForeignKey<DoctorEntity>(d => d.UserID);
+                 .HasForeignKey<Doctor>(d => d.UserID);
             });
-            modelBuilder.Entity<DepartmentEntity>(entity =>
+            modelBuilder.Entity<Department>(entity =>
             {
                 entity.Property(e => e.ID)
                  .HasColumnType("nchar(10)")
@@ -95,7 +95,7 @@ namespace HSMDataAccess.Data
                  .HasColumnType("nchar(10)")
                 .HasMaxLength(10);
             });
-            modelBuilder.Entity<PersonEntity>(entity =>
+            modelBuilder.Entity<Person>(entity =>
             {
                 entity.HasKey(e => e.ID);
                 entity.ToTable(
@@ -141,7 +141,7 @@ namespace HSMDataAccess.Data
                 entity.Property(e => e.DateOfBirth)
               .HasColumnType("date");
             });
-            modelBuilder.Entity<PatientEntity>(entity =>
+            modelBuilder.Entity<Patient>(entity =>
             {
                 entity.HasKey(e => e.ID);
                 entity.ToTable(
@@ -162,11 +162,11 @@ namespace HSMDataAccess.Data
                 .HasMaxLength(10);
                 entity.HasOne(d => d.Person)
                  .WithOne(e => e.Patient)
-                  .HasForeignKey<PatientEntity>(d => d.PersonID)
+                  .HasForeignKey<Patient>(d => d.PersonID)
                   .OnDelete(DeleteBehavior.Restrict)
                   ;
             });
-            modelBuilder.Entity<EmployeeEntity>(entity =>
+            modelBuilder.Entity<Employee>(entity =>
             {
                 entity.HasKey(e => e.ID);
                 entity.Property(e => e.Salary)
@@ -183,7 +183,7 @@ namespace HSMDataAccess.Data
                 .IsRequired();
                 entity.HasOne(d => d.Person)
                  .WithOne(e => e.Employee)
-                  .HasForeignKey<EmployeeEntity>(d => d.PersonID)
+                  .HasForeignKey<Employee>(d => d.PersonID)
                   .OnDelete(DeleteBehavior.Restrict)
                   .HasConstraintName("FK_Employees_People");
             });

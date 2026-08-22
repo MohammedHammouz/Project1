@@ -2,9 +2,9 @@
 using HSMDataAccess.RepositoryServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace HSMBusiness
+namespace HSMBusiness.Services
 {
-    public class User
+    public class UserService
     {
     //    private readonly HSMDataAccess.RepositoryServices.UserRepository _repository;
     //    public string UserID { get; set; } = null!;

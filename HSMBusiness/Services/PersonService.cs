@@ -11,42 +11,20 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HSMBusiness
+namespace HSMBusiness.Services
 {
-    public class Person
+    public class PersonService
     {
-        public string ID { get; set; } = null!;
-        public string Name { get; set; } = null!;
-        public string ContactNumber { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string Gender { get; set; } = null!;
-        public string? Address { get; set; }
-        public DateOnly DateOfBirth { get; set; }
-        private PersonMapper _personDto;
-        public PersonDTO personDTO { 
-            get {
-                return PersonMapper.ToDTO(this); ;
-            }
-            set {
-               PersonMapper.FromDTO(value,this);
-               
-            }
-        }
-        
         private readonly PersonRepository _personRepository;
         public PersonRepository personRepository1 { get { return _personRepository; } }
         public enum enMode { Add=0,Update}
         public enMode Mode = enMode.Add;
-        public Person(PersonRepository personRepository, enMode Mode = enMode.Add)
+        public PersonService(PersonRepository personRepository, enMode Mode = enMode.Add)
         {
             _personRepository = personRepository;
             this.Mode = Mode;
         }
-        public Person()
-        {
-           
-
-        }
+       
         public async  Task<List<PersonDTO>> GetAll()
         {
             var people = await _personRepository.GetAllAsync();
@@ -54,39 +32,31 @@ namespace HSMBusiness
             {
                 return null;
             }
-            return people.Select(p => new PersonDTO(
-            p.ID,
-            p.Name,
-            p.ContactNumber,
-            p.Email,
-            p.Gender,
-            p.Address,
-            p.DateOfBirth
-        ))
+            return people.Select(p =>new PersonMapper().ToDTO(p))
         .ToList();
         }
         
 
-        private async Task<bool> _Add()
+        private async Task<bool> _Add(PersonDTO personDTO)
         {
-            PersonEntity personEntity = PersonMapper.ToEntity(personDTO);
+            var personEntity = new PersonMapper().ToEntity(personDTO);
             var person = await _personRepository.AddAsync(personEntity);
-            this.ID =person.ID;
-            return this.ID != "";
+            personEntity.ID =person.ID;
+            return personEntity.ID != "";
         }
-        private async Task<bool> _Update()
+        private async Task<bool> _Update(string ID)
         {
-            PersonEntity personEntity =
+            Person personEntity =
         await _personRepository.GetByIDAsync(ID);
 
             if (personEntity == null)
                 return false;
-            personEntity = PersonMapper.ToEntity(personDTO);
+           
             return await _personRepository.UpdateAsync(personEntity);
         }
         public async Task<bool>Delete(string ID)
         {
-            PersonEntity person =await _personRepository.GetByIDAsync(ID);
+            Person person =await _personRepository.GetByIDAsync(ID);
             if (person == null)
             {
                 return false;
@@ -95,19 +65,19 @@ namespace HSMBusiness
         }
         public async Task<PersonDTO>GetByID(string ID)
         {
-            PersonEntity person =await _personRepository.GetByIDAsync(ID);
+            Person person =await _personRepository.GetByIDAsync(ID);
             if (person == null)
             {
                 return null;
             }
             return new PersonDTO(ID, person.Name, person.ContactNumber, person.Email, person.Gender, person.Address, person.DateOfBirth);
         }
-        public async Task<bool> Save()
+        public async Task<bool> Save(string ID="",PersonDTO personDTO=null)
         {
             switch (Mode)
             {
                 case enMode.Add:
-                    if(await _Add())
+                    if(await _Add(personDTO))
                     {
                         Mode = enMode.Update;
                         return true;
@@ -117,7 +87,7 @@ namespace HSMBusiness
                         return false;
                     }
                 case enMode.Update:
-                    return await _Update();
+                    return await _Update(ID);
             }
             return false;
         }

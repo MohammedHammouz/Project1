@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.Entities
 {
-    public class ServicesCategoriesEntity
+    public class ServicesCategories
     {
         public int CategoryID { get; set; }
         public string CategoryName { get; set; } = null!;

@@ -1,6 +1,6 @@
 ﻿namespace HSMDataAccess.Entities
 {
-    public class UserEntity
+    public class User
     {
         public string UserID { get; set; } = null!;
         public string Name { get; set; } = null!;
@@ -9,7 +9,7 @@
         public bool Status { get; set; }
         public string HashPassword { get; set; } = null!;
         public int EmployeeID { get; set; }
-        public virtual EmployeeEntity Employee { get; set; } = null!;
+        public virtual Employee Employee { get; set; } = null!;
         
     }
 }

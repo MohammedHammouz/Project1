@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.RepositoryServices
 {
-    public class PatientRepository 
+    public class PatientRepository : GenericRepository<Patient>
     {
-       
+        public PatientRepository(AppDBContext context) : base(context)
+        {
+        }
     }
 }
