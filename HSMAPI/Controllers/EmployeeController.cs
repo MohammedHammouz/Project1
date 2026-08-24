@@ -47,7 +47,7 @@ namespace HSMAPI.Controllers
             else
             {
                 EmployeeService employee = new EmployeeService(_employee.employeeRepository);
-                employee.employeeDTO = newEmployee;
+                
                 
                 await employee.Save();
                 return CreatedAtRoute("GetEmployeeByID", new { id = newEmployee.ID }, newEmployee);

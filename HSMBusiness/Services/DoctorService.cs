@@ -32,7 +32,7 @@ namespace HSMBusiness
             if (doctor == null)
             {
                 response =await resultPattern.GiveResponse(404);
-                return (response.Response,response.IsSuccess,null);
+                return (response.Response,response.IsSuccess,new DoctorDTO(DoctorID,"","",false,""));
             }
             return (response.Response, response.IsSuccess, new DoctorDTO(DoctorID, doctor.DepartmentID, doctor.Specialization, doctor.Status,
                  doctor.UserID));
@@ -74,7 +74,7 @@ namespace HSMBusiness
             doctorEntity.ID = AddNew.ID;
             return doctorEntity.ID != "";
         }
-        private async Task<(string?, bool)> Update(string ID)
+        private async Task<(string?, bool)> Update(string ID,DoctorDTO doctorDTO)
         {
             Doctor? doctorEntity = await _doctor.GetByIDAsync(ID);
             var response = await resultPattern.GiveResponse(200);
@@ -83,11 +83,7 @@ namespace HSMBusiness
                 response = await resultPattern.GiveResponse(404);
                 return (response.Response,response.IsSuccess);
             }
-            if(doctorEntity.DepartmentID==null || doctorEntity.Specialization == null)
-            {
-                response = await resultPattern.GiveResponse(500);
-                return (response.Response, response.IsSuccess);
-            }
+            doctorEntity = new DoctorMapper().ToEntity(doctorDTO);
             return (response.Response, await _doctor.UpdateAsync(doctorEntity));
         }
         public async Task<(string?,bool)> Save(DoctorDTO doctorDTO=null,string ID="")
@@ -108,7 +104,7 @@ namespace HSMBusiness
                         return  (response.Response,response.IsSuccess);
                     }
                 case enMode.Update:
-                    return await Update(ID);
+                    return await Update(ID, doctorDTO);
             }
             response = await resultPattern.GiveResponse(500);
             return (response.Response,response.IsSuccess);

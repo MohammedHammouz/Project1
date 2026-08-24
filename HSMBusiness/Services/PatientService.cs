@@ -52,7 +52,7 @@ namespace HSMBusiness.Services
             patientEntity.ID = NewPatient.ID;
             return patientEntity.ID != "";
         }
-        private async Task<(int, string?, bool)> _Update(string ID)
+        private async Task<(int, string?, bool)> _Update(string ID,PatientDTO patientDTO)
         {
             Patient? patientEntity = await _patientRepository.GetByIDAsync(ID);
             var response = await resultPattern.GiveResponse(200);
@@ -61,7 +61,7 @@ namespace HSMBusiness.Services
                 response = await resultPattern.GiveResponse(404);
                 return (response.Status, response.Response, response.IsSuccess);
             }
-           
+            patientEntity = new PatientMapper().ToEntity(patientDTO);
             return (response.Status, response.Response, await _patientRepository.UpdateAsync(patientEntity));
         }
         public async Task<(int, string?, bool)> Save(PatientDTO patientDTO=null,string ID="")
@@ -81,7 +81,7 @@ namespace HSMBusiness.Services
                         return (response.Status, response.Response, response.IsSuccess);
                     }
                 case enMode.Update:
-                    return await _Update(ID);
+                    return await _Update(ID,patientDTO);
             }
             response = await resultPattern.GiveResponse(500);
             return (response.Status, response.Response, response.IsSuccess);

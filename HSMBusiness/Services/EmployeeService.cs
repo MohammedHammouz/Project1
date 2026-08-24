@@ -1,4 +1,5 @@
 ﻿using HSMBusiness.Mappers;
+using HSMBusiness.Pattern;
 using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
 using HSMDataAccess.RepositoryServices;
@@ -12,13 +13,7 @@ namespace HSMBusiness.Services
 {
     public class EmployeeService
     {
-        //public int ID { get; set; }
-        //public string PersonID { get; set; } = null!;
-        //public decimal Salary { get; set; }
-        //public DateTime HireDate { get; set; }
-        //public bool IsActive { get; set; }
-        //private EmployeeDTO _employeeDTO;
-        
+        ResultPatern resultPattern = new ResultPatern();
         public enum enMode { Add = 0, Update }
         public enMode Mode = enMode.Add;
         private readonly EmployeeRepository _employeeRepository;
@@ -42,64 +37,84 @@ namespace HSMBusiness.Services
             employeeEntity.ID = AddNew.ID;
             return employeeEntity.ID != -1;
         }
-        private async Task<bool> _Update(int ID)
+        private async Task<(int,string?,bool)> _Update(int ID,EmployeeDTO employeeDTO)
         {
             var employee = await _employeeRepository.GetByID(ID);
-
-            if (employee == null)
-                return false;
-            return await _employeeRepository.UpdateAsync(employee);
-        }
-        public async Task<bool> Delete(int ID)
-        {
-            var employee = await _employeeRepository.GetByID(ID);
-            if (employee == null)
-            {
-                return false;
+            var response = await resultPattern.GiveResponse(200);
+            if (employee == null){
+                response = await resultPattern.GiveResponse(404);
+                return (response.Status, response.Response, response.IsSuccess);
             }
-            return await _employeeRepository.DeleteAsync(employee);
+            employee = new EmployeeMapper().ToEntity(employeeDTO);
+            return (response.Status, response.Response, await _employeeRepository.UpdateAsync(employee));
         }
-        public async Task<EmployeeDTO> GetByID(int ID)
+        public async Task<(int,string?,bool)> Delete(int ID)
         {
             var employee = await _employeeRepository.GetByID(ID);
+            var response = await resultPattern.GiveResponse(200);
             if (employee == null)
             {
-                return new EmployeeDTO();
+                response = await resultPattern.GiveResponse(404);
+                return (response.Status,response.Response,response.IsSuccess);
+            }
+            bool IsDeleted= await _employeeRepository.DeleteAsync(employee);
+            if (!IsDeleted)
+            {
+                response = await resultPattern.GiveResponse(500);
+                return (response.Status, response.Response, response.IsSuccess);
+            }
+            return (response.Status, response.Response, response.IsSuccess);
+        }
+        public async Task<(int, string? ,EmployeeDTO)> GetByID(int ID)
+        {
+           
+            var employee = await _employeeRepository.GetByID(ID);
+            var response = await resultPattern.GiveResponse(200);
+            if (employee == null)
+            {
+                response = await resultPattern.GiveResponse(404);
+                return (response.Status, response.Response, new EmployeeDTO());
             }
             
-            return new EmployeeDTO(ID, employee.PersonID, employee.Salary,employee.HireDate,employee.IsActive);
+            return (response.Status, response.Response, new EmployeeDTO(ID, employee.PersonID, employee.Salary,employee.HireDate,employee.IsActive));
         }
        
-        public async Task<List<EmployeeDTO>> GetAll()
+        public async Task<(int, string?, List<EmployeeDTO>)> GetAll()
         {
             var employees = await _employeeRepository.GetAllAsync();
+            var response = await resultPattern.GiveResponse(200);
             if (employees == null)
             {
-                return null;
+                response = await resultPattern.GiveResponse(404);
+                return (response.Status, response.Response, null);
             }
-            return employees.Select(
+            return (response.Status, response.Response, employees.Select(
                 e =>
                 new EmployeeDTO(e.ID, e.PersonID, e.Salary, e.HireDate, e.IsActive)
-                ).ToList();
+                ).ToList());
         }
-        public async Task<bool> Save(EmployeeDTO employeeDTO=null,int ID=-1)
+        public async Task<(int, string?, bool)> Save(EmployeeDTO employeeDTO=null,int ID=-1)
         {
+            var response = await resultPattern.GiveResponse(200);
             switch (Mode)
             {
                 case enMode.Update:
-                    return await _Update(ID);
+                    return await _Update(ID,employeeDTO);
                 case enMode.Add:
                     if (await _AddNew(employeeDTO))
                     {
 
                         Mode = enMode.Update;
-                        return true;
+                        return (response.Status, response.Response, response.IsSuccess);
                     }
 
-                    else
-                        return false;
+                    else{
+                        response = await resultPattern.GiveResponse(500);
+                        return (response.Status, response.Response, response.IsSuccess);
+                    }
             }
-            return false;
+            response = await resultPattern.GiveResponse(500);
+            return (response.Status, response.Response, response.IsSuccess);
         }
     }
 }

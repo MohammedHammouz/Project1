@@ -48,7 +48,7 @@ namespace HSMBusiness.Services
             personEntity.ID =person.ID;
             return personEntity.ID != "";
         }
-        private async Task<(int,string?,bool)> _Update(string ID)
+        private async Task<(int,string?,bool)> _Update(string ID,PersonDTO personDTO)
         {
             Person personEntity =
         await _personRepository.GetByIDAsync(ID);
@@ -58,8 +58,8 @@ namespace HSMBusiness.Services
                 response =await resultPattern.GiveResponse(404);
                 return (response.Status,response.Response,response.IsSuccess);
             }
-                
-       
+
+            personEntity = new PersonMapper().ToEntity(personDTO);
             return (response.Status,response.Response, await _personRepository.UpdateAsync(personEntity));
         }
         public async Task<(int,string?, bool)> Delete(string ID)
