@@ -1,4 +1,5 @@
 ﻿using HSMBusiness.dto;
+using HSMBusiness.Pattern;
 using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
 using HSMDataAccess.RepositoryServices;
@@ -15,6 +16,7 @@ namespace HSMBusiness.Services
 {
     public class PersonService
     {
+        ResultPatern resultPattern = new ResultPatern();
         private readonly PersonRepository _personRepository;
         public PersonRepository personRepository1 { get { return _personRepository; } }
         public enum enMode { Add=0,Update}
@@ -25,15 +27,17 @@ namespace HSMBusiness.Services
             this.Mode = Mode;
         }
        
-        public async  Task<List<PersonDTO>> GetAll()
+        public async  Task<(int,string?,bool,List<PersonDTO>)> GetAll()
         {
             var people = await _personRepository.GetAllAsync();
+            var response = await resultPattern.GiveResponse(200);
             if (people == null)
             {
-                return null;
+                response = await resultPattern.GiveResponse(404);
+                return (response.Status, response.Response,response.IsSuccess,null);
             }
-            return people.Select(p =>new PersonMapper().ToDTO(p))
-        .ToList();
+            return (response.Status, response.Response,response.IsSuccess,people.Select(p =>new PersonMapper().ToDTO(p))
+        .ToList());
         }
         
 
@@ -44,52 +48,69 @@ namespace HSMBusiness.Services
             personEntity.ID =person.ID;
             return personEntity.ID != "";
         }
-        private async Task<bool> _Update(string ID)
+        private async Task<(int,string?,bool)> _Update(string ID)
         {
             Person personEntity =
         await _personRepository.GetByIDAsync(ID);
-
+            var response =await resultPattern.GiveResponse(200);
             if (personEntity == null)
-                return false;
-           
-            return await _personRepository.UpdateAsync(personEntity);
+            {
+                response =await resultPattern.GiveResponse(404);
+                return (response.Status,response.Response,response.IsSuccess);
+            }
+                
+       
+            return (response.Status,response.Response, await _personRepository.UpdateAsync(personEntity));
         }
-        public async Task<bool>Delete(string ID)
+        public async Task<(int,string?, bool)> Delete(string ID)
         {
             Person person =await _personRepository.GetByIDAsync(ID);
+            var response = await resultPattern.GiveResponse(200);
             if (person == null)
             {
-                return false;
+                response = await resultPattern.GiveResponse(200);
+                return (response.Status,response.Response, response.IsSuccess);
             }
-            return await _personRepository.DeleteAsync(person);
+            bool IsDeleted = await _personRepository.DeleteAsync(person);
+            if (!IsDeleted)
+            {
+                response = await resultPattern.GiveResponse(500);
+                return (response.Status,response.Response, response.IsSuccess);
+            }
+            return (response.Status,response.Response, response.IsSuccess);
         }
-        public async Task<PersonDTO>GetByID(string ID)
+        public async Task<(int,bool,string?,PersonDTO)>GetByID(string ID)
         {
             Person person =await _personRepository.GetByIDAsync(ID);
+            var response = await resultPattern.GiveResponse(200);
             if (person == null)
             {
-                return null;
+                response = await resultPattern.GiveResponse(404);
+                return (response.Status,response.IsSuccess,response.Response,null);
             }
-            return new PersonDTO(ID, person.Name, person.ContactNumber, person.Email, person.Gender, person.Address, person.DateOfBirth);
+            return ((response.Status, response.IsSuccess, response.Response, new PersonDTO(ID, person.Name, person.ContactNumber, person.Email, person.Gender, person.Address, person.DateOfBirth));
         }
-        public async Task<bool> Save(string ID="",PersonDTO personDTO=null)
+        public async Task<(int,string?, bool)> Save(string ID="",PersonDTO personDTO=null)
         {
+            var response = await resultPattern.GiveResponse(200);
             switch (Mode)
             {
                 case enMode.Add:
                     if(await _Add(personDTO))
                     {
                         Mode = enMode.Update;
-                        return true;
+                        return (response.Status,response.Response,response.IsSuccess);
                     }
                     else
                     {
-                        return false;
+                        response = await resultPattern.GiveResponse(500);
+                        return (response.Status,response.Response, response.IsSuccess);
                     }
                 case enMode.Update:
                     return await _Update(ID);
             }
-            return false;
+            response = await resultPattern.GiveResponse(500);
+            return (response.Status, response.Response, response.IsSuccess);
         }
     }
 }

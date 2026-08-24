@@ -83,8 +83,12 @@ namespace HSMBusiness
                 response = await resultPattern.GiveResponse(404);
                 return (response.Response,response.IsSuccess);
             }
-            response =await resultPattern.GiveResponse(200);
-            return (response.Response,await _doctor.UpdateAsync(doctorEntity));
+            if(doctorEntity.DepartmentID==null || doctorEntity.Specialization == null)
+            {
+                response = await resultPattern.GiveResponse(500);
+                return (response.Response, response.IsSuccess);
+            }
+            return (response.Response, await _doctor.UpdateAsync(doctorEntity));
         }
         public async Task<(string?,bool)> Save(DoctorDTO doctorDTO=null,string ID="")
         {
