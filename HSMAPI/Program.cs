@@ -32,6 +32,8 @@ namespace HSMAPI
             builder.Services.AddScoped<DoctorService>();
             builder.Services.AddScoped<EmployeeRepository>();
             builder.Services.AddScoped<EmployeeService>();
+            builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<UserService>();
             var app = builder.Build();
             
             // Configure the HTTP request pipeline.

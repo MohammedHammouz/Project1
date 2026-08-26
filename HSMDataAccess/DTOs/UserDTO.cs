@@ -14,19 +14,19 @@ namespace HSMDataAccess.DTOs
         public bool Status { get; set; }
         public string PasswordHash { get; set; }
         
-        public int EmployeeID { get; set; }
+        public string EmployeeID { get; set; }
         public UserDTO()
         {
 
         }
         public UserDTO(string UserID, string Name, string Role,bool Status,
-            string PasswordHash)
+            string PasswordHash,string EmployeeID)
         {
             this.UserID = UserID;
             this.Name = Name;
             this.Role = Role;
             this.Status = Status;
-            
+            this.EmployeeID = EmployeeID;
             this.PasswordHash = PasswordHash;
             
         }

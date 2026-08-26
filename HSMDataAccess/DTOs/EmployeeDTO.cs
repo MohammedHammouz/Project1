@@ -8,7 +8,7 @@ namespace HSMDataAccess.DTOs
 {
     public class EmployeeDTO
     {
-        public int ID { get; set; }
+        public string ID { get; set; } = null!;
         public string PersonID { get; set; } = null!;
         public decimal Salary { get; set; }
         public DateTime HireDate { get; set; }
@@ -17,7 +17,7 @@ namespace HSMDataAccess.DTOs
         {
 
         }
-        public EmployeeDTO(int ID, string PersonID, decimal Salary, DateTime HireDate, bool IsActive)
+        public EmployeeDTO(string ID, string PersonID, decimal Salary, DateTime HireDate, bool IsActive)
         {
             this.ID = ID;
             this.PersonID = PersonID;
