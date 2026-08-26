@@ -25,24 +25,36 @@ namespace HSMDataAccess.Data
         //public virtual DbSet<ServicesCategoriesEntity> ServicesCategories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Entities.User>(entity =>
+            modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(e => e.UserID);
+                entity.HasKey(e => e.ID);
 
 
                 entity.ToTable(e =>
                             e.HasCheckConstraint
                             ("CK_Users_Role", "([Role]='Management' OR [Role]=' Accounts' OR [Role]='Nurse' OR [Role]='Doctor' OR [Role]='Admin')"));
-                entity.Property(e => e.UserID)
+                entity.ToTable(e =>
+                            e.HasCheckConstraint
+                            ("CK_Users_Status", "([Status]=(1) OR [Status]=(0))"));
+                
+                entity.Property(e => e.ID)
                 .ValueGeneratedOnAdd();
-                entity.Property(e => e.Role)
-                .HasMaxLength(10)
-                .HasColumnType("nvarchar(10)")
-                .IsRequired();
-                entity.Property(e => e.Status);
-                entity.Property(e => e.HashPassword)
-                .HasMaxLength(10)
+                entity.Property(e => e.Name)
                 .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
+                .IsRequired();
+                entity.Property(e => e.Role)
+                .IsRequired();
+                entity.Property(e => e.Status)
+                .HasColumnType("bit")
+                .IsRequired();
+                entity.Property(e => e.PasswordHash)
+                .HasColumnType("nvarchar(255)")
+                .HasMaxLength(255)
+                .IsRequired();
+                entity.Property(e => e.EmployeeID)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
                 .IsRequired();
                 entity.HasOne(u => u.Employee)
                   .WithOne()
@@ -154,6 +166,9 @@ namespace HSMDataAccess.Data
 
                 entity.Property(e => e.ID)
                 .ValueGeneratedOnAdd();
+                entity.Property(e => e.ID)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10);
                 entity.Property(e => e.MedicalHistory)
                 .HasColumnType("text");
                 entity.Property(e => e.Status)
@@ -169,6 +184,8 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<Employee>(entity =>
             {
                 entity.HasKey(e => e.ID);
+                entity.Property(e => e.ID)
+                .ValueGeneratedOnAdd();
                 entity.Property(e => e.Salary)
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired();
@@ -187,17 +204,184 @@ namespace HSMDataAccess.Data
                   .OnDelete(DeleteBehavior.Restrict)
                   .HasConstraintName("FK_Employees_People");
             });
-            //modelBuilder.Entity<ServicesCategoriesEntity>(entity =>
-            //{
-            //    entity.HasKey(e => e.CategoryID);
-            //    entity.HasIndex(e => e.CategoryName, "UQ__Service__CategoryName")
-            //    .IsUnique();
-            //    entity.Property(e => e.CategoryName)
-            //    .HasColumnType("nchar(10)")
-            //    .HasMaxLength(10);
-            //    entity.Property(e => e.CategoryDescription)
-            //    .HasColumnType("text");
-            //});
+            modelBuilder.Entity<Notifiction>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+
+                entity.Property(e => e.ID)
+                    .HasColumnType("nchar(10)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.PatientID)
+                    .HasColumnType("nchar(10)")
+                    .HasMaxLength(10)
+                    .IsRequired();
+
+                entity.Property(e => e.UserID)
+                    .HasColumnType("nchar(10)")
+                    .HasMaxLength(10)
+                    .IsRequired();
+
+                entity.Property(e => e.Type)
+                    .HasColumnType("nchar(5)")
+                    .HasMaxLength(5)
+                    .IsRequired();
+
+                entity.Property(e => e.Message)
+                    .HasColumnType("text")
+                    .IsRequired();
+
+                entity.Property(e => e.Status)
+                    .HasColumnType("nchar(10)")
+                    .HasMaxLength(10)
+                    .IsRequired();
+
+                entity.Property(e => e.SentOn)
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.DeliveryConfirmation)
+                    .HasColumnType("bit");
+
+                entity.HasOne(d => d.User)
+                 .WithMany(n => n.notifiction)
+                  .HasForeignKey(d => d.UserID)
+                  .OnDelete(DeleteBehavior.Restrict);
+                 
+                entity.HasOne(d => d.patient)
+                 .WithMany(n => n.notifiction)
+                  .HasForeignKey(d => d.UserID)
+                  .OnDelete(DeleteBehavior.Restrict);
+                entity.ToTable(
+                   t =>
+                   {
+                       t
+                       .HasCheckConstraint
+                       ("CK_Notification_Status", "([Status]='Pending' OR [Status]='Failed' OR [Status]='Sent')");
+                   });
+                entity.ToTable(
+                   t =>
+                   {
+                       t
+                       .HasCheckConstraint
+                       ("CK_Notification_Type", "([Type]='SMS' OR [Type]='Email')");
+                   });
+            });
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+
+                entity.Property(e => e.ID)
+                    .HasColumnType("nchar(10)")
+                    .HasMaxLength(10)
+                    .IsRequired();
+
+                entity.Property(e => e.Type)
+                    .HasColumnType("nchar(10)")
+                    .HasMaxLength(10)
+                    .IsRequired();
+
+                entity.Property(e => e.GeneratedOn)
+                    .HasColumnType("datetime")
+                    .IsRequired();
+
+                entity.Property(e => e.GeneratedBy)
+                    .HasColumnType("nchar(10)")
+                    .HasMaxLength(10)
+                    .IsRequired();
+
+                entity.Property(e => e.AppointmentCount)
+                    .HasColumnType("int");
+
+                entity.Property(e => e.Revenue)
+                    .HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.PaymentsReceived)
+                    .HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.PendingPayments)
+                    .HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.Metrics)
+                    .HasColumnType("text");
+
+                entity.Property(e => e.ExportFormat)
+                    .HasColumnType("nchar(5)")
+                    .HasMaxLength(5);
+
+                entity.Property(e => e.Status)
+                    .HasColumnType("nchar(7)")
+                    .HasMaxLength(7);
+
+                entity.Property(e => e.Notes)
+                    .HasColumnType("text");
+                entity.ToTable(
+                  t =>
+                  {
+                      t
+                      .HasCheckConstraint
+                      ("CK_Reports_ExportFormat", "([ExportFormat]='Excel' OR [ExportFormat]='PDF')");
+                  });
+                entity.ToTable(
+                   t =>
+                   {
+                       t
+                       .HasCheckConstraint
+                       ("CK_Reports_Type", "([Type]='Monthly' OR [Type]='Weekly' OR [Type]='Daily')");
+                   });
+                entity.HasOne(d => d.user)
+                .WithMany(n => n.report)
+                 .HasForeignKey(d => d.GeneratedBy)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Appointment>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+
+                entity.Property(e => e.ID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(e => e.PatientID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(e => e.DoctorID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(e => e.Date)
+                    .HasColumnType("date")
+                    .IsRequired();
+
+                entity.Property(e => e.Time)
+                    .HasColumnType("time(7)");
+
+                entity.Property(e => e.Duration)
+                    .HasColumnType("int")
+                    .IsRequired();
+
+                entity.Property(e => e.Status)
+                    .HasColumnType("nchar(15)")
+                    .IsRequired();
+
+                entity.Property(e => e.NotificationSent)
+                    .HasColumnType("bit");
+                entity.ToTable(
+                 t =>
+                 {
+                     t
+                     .HasCheckConstraint
+                     ("CK_Appointments_Status", "([Status]='Cancelled' OR [Status]='Rescheduled' OR [Status]='Scheduled')");
+                 });
+                entity.HasOne(d => d.patient)
+                 .WithMany(n => n.appointment)
+                  .HasForeignKey(d => d.PatientID)
+                  .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(d => d.doctor)
+                 .WithMany(n => n.appointment)
+                  .HasForeignKey(d => d.DoctorID)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
