@@ -1,4 +1,7 @@
-﻿using HSMDataAccess.Data;
+﻿using HSMBusiness.Mappers;
+using HSMDataAccess.Data;
+using HSMDataAccess.DTOs;
+using HSMDataAccess.Entities;
 using HSMDataAccess.RepositoryServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -6,89 +9,95 @@ namespace HSMBusiness.Services
 {
     public class UserService
     {
-    //    private readonly HSMDataAccess.RepositoryServices.UserRepository _repository;
-    //    public string UserID { get; set; } = null!;
-    //    public string Name { get; set; } = null!;
-    //    public string Role { get; set; } = null!;
-    //    public string Email { get; set; } = null!;
-    //    public string? ContactNumber { get; set; } = null;
-    //    public bool Status { get; set; }
-    //    public DateTime CreatedOn { get; set; } = DateTime.Now;
-    //    public DateTime? UpdatedOn { get; set; }
-    //    public string AccessLevel { get; set; } = null!;
-    //    public string Password { get; set; }
-    //    public string CreatedBy { get; set; } = null!;
-    //    public string UpdatedBy { get; set; } = null!;
-    //    public enum enMode { Add = 0, Update }
-    //    public enMode Mode = enMode.Add;
-    //    public HSMDataAccess.DTOs.UserDTO user {get {
-    //            return new HSMDataAccess.DTOs.UserDTO(UserID, Name, Role, Status,Password);
-    //        } }
-    //    public User(HSMDataAccess.DTOs.UserDTO user, HSMDataAccess.RepositoryServices.UserRepository repository, enMode Mode = enMode.Add)
-    //    {
-    //        this.UserID = user.UserID;
-    //        this.Name = user.Name;
-    //        this.Role = user.Role;
-    //        _repository = repository;
-    //        this.Status = user.Status;
+        private readonly UserRepository _repository;
+       
+        public enum enMode { Add = 0, Update }
+        public enMode Mode = enMode.Add;
+        
+        public UserService(UserRepository repository, enMode Mode = enMode.Add)
+        {
           
-    //        this.Mode = Mode;
-    //}
-    //    private async Task<bool> _AddNew()
-    //    {
-    //        this.UserID =await _repository.AddUser(user);
-    //        return this.UserID!="";
-    //    }
-    //    private async Task<bool> _Update()
-    //    {
-    //        return await _repository.UpdateUser(user);
-    //    }
-    //    public async Task<bool>Delete(string UserID)
-    //    {
-    //        var user =await _repository.GetUseByID(UserID);
-    //        if (user == null)
-    //        {
-    //            return false;
-    //        }
-    //        return await _repository.Delete(UserID);
-    //    }
-    //    public async Task<HSMDataAccess.DTOs.UserDTO> GetUseByID(string ID)
-    //    {
-    //        HSMDataAccess.DTOs.UserDTO CurrentUser = new HSMDataAccess.DTOs.UserDTO("", "", "", false,"");
-    //        var user1 = await _repository.GetUseByID(ID);
-    //        if (user1 == null)
-    //        {
-    //            return new HSMDataAccess.DTOs.UserDTO("", "", "", false, "");
-    //        }
-    //        CurrentUser.UserID = ID;
-    //        CurrentUser.Name = user1.Name;
-    //        CurrentUser.Role = user1.Role;
-    //        CurrentUser.Status = user1.Status;
-    //        CurrentUser.PasswordHash = user1.HashPassword;
-    //        return CurrentUser;
-    //    }
-    //    public async Task<List<HSMDataAccess.DTOs.UserDTO>> GetUsers()
-    //    {
-    //        return await _repository.GetAllUsers();
-    //    }
-    //    public async Task<bool> Save()
-    //    {
-    //        switch (Mode)
-    //        {
-    //            case enMode.Update:
-    //                return await _Update();
-    //            case enMode.Add:
-    //                if (await _AddNew())
-    //                {
-                        
-    //                    Mode = enMode.Update;
-    //                    return true;
-    //                }
-                        
-    //                else
-    //                    return false;
-    //        }
-    //        return false;
-    //    }
+            _repository = repository;
+            
+
+            this.Mode = Mode;
+        }
+        public UserRepository userRepository
+        {
+            get
+            {
+                return _repository;
+            }
+        }
+        private async Task<bool> _AddNew(UserDTO userDTO)
+        {
+            var user = new UserMapper().ToEntity(userDTO);
+           var NewUser = await _repository.AddAsync(user);
+            user.ID = NewUser.ID;
+            Console.WriteLine($"ID: {user.ID}");
+            Console.WriteLine($"EmployeeID: {user.EmployeeID}");
+
+            return user.ID != "";
+        }
+        private async Task<bool> _Update(string ID,UserDTO userDTO)
+        {
+
+           User user = await _repository.GetByIDAsync(ID);
+            if (!await _repository.ExistsAsync(ID))
+                return false;
+            if (user == null)
+            {
+                return false;
+            }
+            user = new UserMapper().ToEntity(userDTO,UserMapper.enMode.Update,user);
+            return await _repository.UpdateAsync(user);
+        }
+        public async Task<bool> Delete(string UserID)
+        {
+            var user = await _repository.GetByIDAsync(UserID);
+            if (user == null)
+            {
+                return false;
+            }
+            return await _repository.DeleteAsync(user);
+        }
+        public async Task<UserDTO> GetUseByID(string ID)
+        {
+           UserDTO CurrentUser = new UserDTO("", "", "", false, "","");
+            var user1 = await _repository.GetByIDAsync(ID);
+            if (user1 == null)
+            {
+                return new UserDTO("", "", "", false, "","");
+            }
+            CurrentUser = new UserMapper().ToDTO(user1);
+            return CurrentUser;
+        }
+        public async Task<List<UserDTO>> GetAll()
+        {
+            var users= await _repository.GetAllAsync();
+            return users.Select(
+                u =>
+                new UserMapper().ToDTO(u)
+                ).ToList();
+        }
+        public async Task<bool> Save(UserDTO userDTO,string ID="")
+        {
+            switch (Mode)
+            {
+                case enMode.Update:
+                    return await _Update(ID,userDTO);
+                case enMode.Add:
+                    if (await _AddNew(userDTO))
+                    {
+
+                        Mode = enMode.Update;
+                        return true;
+                    }
+
+                    else
+                        return false;
+            }
+            return false;
+        }
     }
 }
