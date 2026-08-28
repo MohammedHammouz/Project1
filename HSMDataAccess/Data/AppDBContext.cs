@@ -382,6 +382,67 @@ namespace HSMDataAccess.Data
                   .HasForeignKey(d => d.DoctorID)
                   .OnDelete(DeleteBehavior.Restrict);
             });
+            modelBuilder.Entity<Bill>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+
+                entity.Property(e => e.ID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(e => e.PatientID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(e => e.Status)
+                    .HasColumnType("varchar(30)")
+                    .IsRequired();
+
+                entity.Property(e => e.Date)
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.PartialPaymentAmount)
+                    .HasColumnType("decimal(10,2)");
+
+                entity.Property(e => e.DueDate)
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Invoice)
+                    .HasColumnType("varchar(50)")
+                    .IsRequired();
+
+                entity.Property(e => e.GrossAmount)
+                    .HasColumnType("decimal(10,2)")
+                    .IsRequired();
+
+                entity.Property(e => e.Discount)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(e => e.InsuranceCoverage)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(e => e.PatientResponsibility)
+                    .HasColumnType("decimal(10,2)")
+                    .IsRequired();
+                entity.HasIndex(e => e.Date, "idx_bills_date");
+                entity.HasIndex(e => e.DueDate, "idx_bills_due_date");
+                entity.HasIndex(e => e.PatientID, "idx_bills_patient");
+                entity.HasIndex(e => e.Status, "idx_bills_status");
+                entity.HasIndex(e => e.Invoice)
+                .IsUnique()
+                .HasDatabaseName("UQ_Bills_Invoice");
+                entity.ToTable(
+                 t =>
+                 {
+                     t
+                     .HasCheckConstraint
+                     ("CK_Bills_Status", "([Status]='Pending Insurance' OR [Status]='Cancelled' OR [Status]='Partially Paid' OR [Status]='Unpaid' OR [Status]='Paid')");
+                 });
+                entity.HasOne(d => d.patient)
+                 .WithMany(n => n.bill)
+                  .HasForeignKey(d => d.PatientID)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
