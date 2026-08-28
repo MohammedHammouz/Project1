@@ -60,11 +60,11 @@ namespace HSMBusiness
             var response =await resultPattern.GiveResponse(200);
             if (doctors == null)
             {
-                response =await resultPattern.GiveResponse(500);
+                response =await resultPattern.GiveResponse(404);
                 return (response.Response,response.IsSuccess,null);
             }
 
-            return (response.Response,response.IsSuccess, doctors.Select(d => new DoctorDTO(d.ID,d.DepartmentID,d.Specialization,d.Status,d.UserID))
+            return (response.Response,response.IsSuccess, doctors.Select(d => new DoctorMapper().ToDTO(d))
         .ToList());
         }
         private async Task<bool> Add(DoctorDTO doctorDTO)
@@ -83,7 +83,7 @@ namespace HSMBusiness
                 response = await resultPattern.GiveResponse(404);
                 return (response.Response,response.IsSuccess);
             }
-            doctorEntity = new DoctorMapper().ToEntity(doctorDTO);
+            doctorEntity = new DoctorMapper().ToEntity(doctorDTO,DoctorMapper.enMode.Update,doctorEntity);
             return (response.Response, await _doctor.UpdateAsync(doctorEntity));
         }
         public async Task<(string?,bool)> Save(DoctorDTO doctorDTO=null,string ID="")
@@ -96,13 +96,13 @@ namespace HSMBusiness
                     if (await Add(doctorDTO))
                     {
                         mode = enMode.Update;
-                        return (response.Response, response.IsSuccess);
                     }
                     else
                     {
                         response =await  resultPattern.GiveResponse(500);
-                        return  (response.Response,response.IsSuccess);
+                        
                     }
+                    return (response.Response, response.IsSuccess);
                 case enMode.Update:
                     return await Update(ID, doctorDTO);
             }

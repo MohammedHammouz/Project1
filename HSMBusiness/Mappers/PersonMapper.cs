@@ -14,6 +14,7 @@ namespace HSMBusiness.dto
 
     public class PersonMapper
     {
+        public enum enMode { Add ,Update}
 
         public  PersonDTO ToDTO(HSMDataAccess.Entities.Person person)
         {
@@ -21,19 +22,31 @@ namespace HSMBusiness.dto
                 person.ContactNumber, person.Email,
                 person.Gender, person.Address, person.DateOfBirth);
         }
-        public  Person ToEntity(PersonDTO personDTO)
+        public  Person ToEntity(PersonDTO personDTO,enMode mode=enMode.Add,Person person=null)
         {
-           
-            return new HSMDataAccess.Entities.Person
+            if (mode == enMode.Add)
             {
-                ID = Guid.NewGuid().ToString("N").Substring(0, 10),
-                Name = personDTO.Name,
-                ContactNumber = personDTO.ContactNumber,
-                Email = personDTO.Email,
-                Gender = personDTO.Gender,
-                Address= personDTO.Address,
-                DateOfBirth= personDTO.DateOfBirth
-            };
+                return new Person
+                {
+                    ID = Guid.NewGuid().ToString("N").Substring(0, 10),
+                    Name = personDTO.Name,
+                    ContactNumber = personDTO.ContactNumber,
+                    Email = personDTO.Email,
+                    Gender = personDTO.Gender,
+                    Address = personDTO.Address,
+                    DateOfBirth = personDTO.DateOfBirth
+                };
+            }
+            else
+            {
+                person.Name = personDTO.Name;
+                person.ContactNumber = personDTO.ContactNumber;
+                person.Email = personDTO.Email;
+                person.Gender = personDTO.Gender;
+                person.Address = personDTO.Address;
+                person.DateOfBirth = personDTO.DateOfBirth;
+                return person;
+            }
         }
        
     }

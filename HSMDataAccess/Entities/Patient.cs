@@ -15,5 +15,7 @@ namespace HSMDataAccess.Entities
         public bool Status { get; set; } = false;
         public string PersonID { get; set; } = null!;
         public virtual Person Person { get; set; } = null!;
+        public ICollection<Notifiction> notifiction { get; set; } = new List<Notifiction>();
+        public ICollection<Appointment> appointment { get; set; } = new List<Appointment>();
     }
 }

@@ -12,6 +12,7 @@ namespace HSMBusiness.dto
 {
     public class DoctorMapper
     {  
+        public enum enMode { Add,Update}
         public DoctorDTO ToDTO(Doctor doctor)
         {
             return new DoctorDTO(doctor.ID,
@@ -21,16 +22,26 @@ namespace HSMBusiness.dto
                     doctor.UserID
                 );
         }
-        public Doctor ToEntity(DoctorDTO doctorDTO)
+        public Doctor ToEntity(DoctorDTO doctorDTO,enMode mode=enMode.Add,Doctor doctor=null)
         {
-            return new Doctor
+            if (mode==enMode.Add)
+                return new Doctor
+                {
+                    ID = doctorDTO.ID,
+                    DepartmentID = doctorDTO.DepartmentID,
+                    Specialization = doctorDTO.Specialization,
+                    Status = doctorDTO.Status,
+                    UserID = doctorDTO.UserID
+                };
+            else
             {
-                ID = doctorDTO.ID,
-                DepartmentID = doctorDTO.DepartmentID,
-                Specialization = doctorDTO.Specialization,
-                Status = doctorDTO.Status,
-                UserID = doctorDTO.UserID
-            };
+                doctor.DepartmentID = doctorDTO.DepartmentID;
+                doctor.Specialization = doctorDTO.Specialization;
+                doctor.Status = doctorDTO.Status;
+                doctor.UserID = doctorDTO.UserID;
+                return doctor;
+            }
+
         }
         
     }

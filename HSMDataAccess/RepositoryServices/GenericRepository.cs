@@ -45,8 +45,15 @@ namespace HSMDataAccess.RepositoryServices
         public async Task<bool> UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
+            await _context.SaveChangesAsync();
             int AffectedRows = await _context.SaveChangesAsync();
+            Console.WriteLine($"AffectedRows: {AffectedRows}");
             return AffectedRows > 0;
+        }
+        public async Task<bool> ExistsAsync(string ID)
+        {
+            return await _context.Set<T>()
+                .AnyAsync(e => EF.Property<string>(e, "ID") == ID);
         }
     }
 }

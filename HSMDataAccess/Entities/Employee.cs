@@ -8,11 +8,12 @@ namespace HSMDataAccess.Entities
 {
     public class Employee
     {
-        public int ID { get; set; }
+        public string ID { get; set; } = null!;
         public string PersonID { get; set; } = null!;
         public decimal Salary { get; set; }
         public DateTime HireDate { get; set; }
         public bool IsActive { get; set; }
         public virtual Person Person { get; set; } = null!;
+
     }
 }

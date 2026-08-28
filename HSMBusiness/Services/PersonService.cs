@@ -59,7 +59,7 @@ namespace HSMBusiness.Services
                 return (response.Status,response.Response,response.IsSuccess);
             }
 
-            personEntity = new PersonMapper().ToEntity(personDTO);
+            personEntity = new PersonMapper().ToEntity(personDTO,PersonMapper.enMode.Update,personEntity);
             return (response.Status,response.Response, await _personRepository.UpdateAsync(personEntity));
         }
         public async Task<(int,string?, bool)> Delete(string ID)
@@ -88,7 +88,7 @@ namespace HSMBusiness.Services
                 response = await resultPattern.GiveResponse(404);
                 return (response.Status,response.IsSuccess,response.Response,null);
             }
-            return ((response.Status, response.IsSuccess, response.Response, new PersonDTO(ID, person.Name, person.ContactNumber, person.Email, person.Gender, person.Address, person.DateOfBirth));
+            return ((response.Status, response.IsSuccess, response.Response, new PersonDTO(ID, person.Name, person.ContactNumber, person.Email, person.Gender, person.Address, person.DateOfBirth)));
         }
         public async Task<(int,string?, bool)> Save(string ID="",PersonDTO personDTO=null)
         {
@@ -107,7 +107,7 @@ namespace HSMBusiness.Services
                         return (response.Status,response.Response, response.IsSuccess);
                     }
                 case enMode.Update:
-                    return await _Update(ID);
+                    return await _Update(ID,personDTO);
             }
             response = await resultPattern.GiveResponse(500);
             return (response.Status, response.Response, response.IsSuccess);

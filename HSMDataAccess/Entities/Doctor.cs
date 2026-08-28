@@ -21,7 +21,7 @@ namespace HSMDataAccess.Entities
         public virtual Department Department { get; set; } = null!;
         
         public virtual  User User { get; set; } = null!;
-      
 
+        public ICollection<Appointment> appointment { get; set; } = new List<Appointment>();
     }
 }

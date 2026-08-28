@@ -35,7 +35,7 @@ namespace HSMBusiness.Services
             var employeeEntity = new EmployeeMapper().ToEntity(employeeDTO);
             var AddNew = await _employeeRepository.AddAsync(employeeEntity);
             employeeEntity.ID = AddNew.ID;
-            return employeeEntity.ID != -1;
+            return employeeEntity.ID != "";
         }
         private async Task<(int,string?,bool)> _Update(int ID,EmployeeDTO employeeDTO)
         {
@@ -45,7 +45,7 @@ namespace HSMBusiness.Services
                 response = await resultPattern.GiveResponse(404);
                 return (response.Status, response.Response, response.IsSuccess);
             }
-            employee = new EmployeeMapper().ToEntity(employeeDTO);
+            employee = new EmployeeMapper().ToEntity(employeeDTO,EmployeeMapper.enMode.Update,employee);
             return (response.Status, response.Response, await _employeeRepository.UpdateAsync(employee));
         }
         public async Task<(int,string?,bool)> Delete(int ID)
@@ -65,10 +65,10 @@ namespace HSMBusiness.Services
             }
             return (response.Status, response.Response, response.IsSuccess);
         }
-        public async Task<(int, string? ,EmployeeDTO)> GetByID(int ID)
+        public async Task<(int, string? ,EmployeeDTO)> GetByID(string ID)
         {
            
-            var employee = await _employeeRepository.GetByID(ID);
+            var employee = await _employeeRepository.GetByIDAsync(ID);
             var response = await resultPattern.GiveResponse(200);
             if (employee == null)
             {
@@ -90,8 +90,7 @@ namespace HSMBusiness.Services
             }
             return (response.Status, response.Response, employees.Select(
                 e =>
-                new EmployeeDTO(e.ID, e.PersonID, e.Salary, e.HireDate, e.IsActive)
-                ).ToList());
+                new EmployeeMapper().ToDTO(e)).ToList());
         }
         public async Task<(int, string?, bool)> Save(EmployeeDTO employeeDTO=null,int ID=-1)
         {
