@@ -1,4 +1,5 @@
-﻿using HSMDataAccess.DTOs;
+﻿using HSMBusiness.Mappers;
+using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace HSMBusiness.dto
     public class DoctorMapper
     {  
         public enum enMode { Add,Update}
+
         public DoctorDTO ToDTO(Doctor doctor)
         {
             return new DoctorDTO(doctor.ID,
@@ -24,7 +26,7 @@ namespace HSMBusiness.dto
         }
         public Doctor ToEntity(DoctorDTO doctorDTO,enMode mode=enMode.Add,Doctor doctor=null)
         {
-            if (mode==enMode.Add)
+            if (mode == enMode.Add)
                 return new Doctor
                 {
                     ID = doctorDTO.ID,

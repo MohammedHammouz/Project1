@@ -7,19 +7,17 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HSMBusiness.Services
 {
-    public class UserService
+    public class UserService 
     {
         private readonly UserRepository _repository;
-       
+
         public enum enMode { Add = 0, Update }
         public enMode Mode = enMode.Add;
-        
-        public UserService(UserRepository repository, enMode Mode = enMode.Add)
+
+        public UserService(UserRepository repository, enMode Mode = enMode.Add) 
         {
           
             _repository = repository;
-            
-
             this.Mode = Mode;
         }
         public UserRepository userRepository
@@ -34,9 +32,6 @@ namespace HSMBusiness.Services
             var user = new UserMapper().ToEntity(userDTO);
            var NewUser = await _repository.AddAsync(user);
             user.ID = NewUser.ID;
-            Console.WriteLine($"ID: {user.ID}");
-            Console.WriteLine($"EmployeeID: {user.EmployeeID}");
-
             return user.ID != "";
         }
         private async Task<bool> _Update(string ID,UserDTO userDTO)
@@ -52,29 +47,21 @@ namespace HSMBusiness.Services
             user = new UserMapper().ToEntity(userDTO,UserMapper.enMode.Update,user);
             return await _repository.UpdateAsync(user);
         }
-        public async Task<bool> Delete(string UserID)
+
+        public async Task<UserDTO> GetByID(string ID)
         {
-            var user = await _repository.GetByIDAsync(UserID);
-            if (user == null)
-            {
-                return false;
-            }
-            return await _repository.DeleteAsync(user);
-        }
-        public async Task<UserDTO> GetUseByID(string ID)
-        {
-           UserDTO CurrentUser = new UserDTO("", "", "", false, "","");
+            UserDTO CurrentUser = new UserDTO("", "", "", false, "", "");
             var user1 = await _repository.GetByIDAsync(ID);
             if (user1 == null)
             {
-                return new UserDTO("", "", "", false, "","");
+                return new UserDTO("", "", "", false, "", "");
             }
             CurrentUser = new UserMapper().ToDTO(user1);
             return CurrentUser;
         }
         public async Task<List<UserDTO>> GetAll()
         {
-            var users= await _repository.GetAllAsync();
+            var users = await _repository.GetAllAsync();
             return users.Select(
                 u =>
                 new UserMapper().ToDTO(u)

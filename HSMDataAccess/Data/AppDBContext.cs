@@ -20,9 +20,18 @@ namespace HSMDataAccess.Data
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Doctor> Doctors { get; set; }
         public virtual DbSet<Person> People { get; set; }
-        //public virtual DbSet<PatientEntity> Patients { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
-        //public virtual DbSet<ServicesCategoriesEntity> ServicesCategories { get; set; }
+        public virtual DbSet<Bill> Bills { get; set; }
+        public virtual DbSet<Patient> Patients { get; set; }
+        public virtual DbSet<Notifiction> Notifictions { get; set; }
+        public virtual DbSet<Report> Reports { get; set; }
+        public virtual DbSet<Appointment> Appointments { get; set; }
+        public virtual DbSet<AuditLog> AuditLogs { get; set; }
+        public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
+        public virtual DbSet<MedicalService> MedicalServices { get; set; }
+        public virtual DbSet<MedicalRecord> MedicalRecords { get; set; }
+        public virtual DbSet<BillService> BillServices { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(entity =>
@@ -442,6 +451,184 @@ namespace HSMDataAccess.Data
                  .WithMany(n => n.bill)
                   .HasForeignKey(d => d.PatientID)
                   .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<AuditLog>(entity =>
+            {
+                entity.ToTable("AuditLogs");
+
+                entity.HasKey(x => x.ID);
+
+                entity.Property(x => x.ID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.UserID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.Entity)
+                    .HasColumnType("nvarchar(50)")
+                    .IsRequired();
+
+                entity.Property(x => x.Action)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.Timestamp)
+                    .HasColumnType("datetime")
+                    .IsRequired();
+
+                entity.Property(x => x.Details)
+                    .HasColumnType("text");
+                entity.ToTable(
+                 t =>
+                 {
+                     t
+                     .HasCheckConstraint
+                     ("CK_AuditLogs_Action", "([Action]='Access' OR [Action]='Delete' OR [Action]='Update' OR [Action]='Create')");
+                 });
+                entity.HasOne(d => d.user)
+                 .WithMany(n => n.auditLog)
+                  .HasForeignKey(d => d.UserID)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<ServiceCategory>(entity =>
+            {
+                entity.ToTable("ServiceCategories");
+
+                entity.HasKey(x => x.ID);
+
+                entity.Property(x => x.ID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.CategoryName)
+                    .HasColumnType("varchar(100)")
+                    .IsRequired();
+
+                entity.Property(x => x.CategoryDescription)
+                    .HasColumnType("text");
+                entity.HasIndex(e => e.CategoryName)
+                .IsUnique()
+                .HasDatabaseName("UQ__Service__CategoryName");
+                
+
+            });
+            modelBuilder.Entity<MedicalService>(entity =>
+            {
+                entity.HasKey(x => x.ID);
+
+                entity.Property(x => x.ID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.ServiceName)
+                    .HasColumnType("varchar(255)")
+                    .IsRequired();
+
+                entity.Property(x => x.CategoryID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.DefaultPrice)
+                    .HasColumnType("decimal(10,2)")
+                    .IsRequired();
+
+                entity.Property(x => x.Description)
+                    .HasColumnType("text");
+
+                entity.Property(x => x.DurationMinutes);
+
+                entity.HasIndex(e => e.ServiceName, "UQ__MedicalService__ServiceName");
+                entity.HasOne(d => d.serviceCategory)
+                .WithMany(n => n.medicalService)
+                 .HasForeignKey(d => d.CategoryID)
+                 .OnDelete(DeleteBehavior.Restrict);
+                
+            });
+            modelBuilder.Entity<MedicalRecord>(entity =>
+            {
+                entity.HasKey(x => x.ID);
+
+                entity.Property(x => x.ID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.PatientID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.Diagnosis)
+                    .HasColumnType("text")
+                    .IsRequired(false);
+
+                entity.Property(x => x.Treatment)
+                    .HasColumnType("text")
+                    .IsRequired(false);
+
+                entity.Property(x => x.Prescriptions)
+                    .HasColumnType("text")
+                    .IsRequired(false);
+
+                entity.Property(x => x.Status)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired(false);
+
+                entity.Property(x => x.AuditTrail)
+                    .HasColumnType("text")
+                    .IsRequired();
+
+                entity.Property(x => x.AccessLevel)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.HasOne(x => x.patient)
+                    .WithMany(x => x.medicalRecord)
+                    .HasForeignKey(x => x.PatientID)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.ToTable(
+                 t =>
+                 {
+                     t
+                     .HasCheckConstraint
+                     ("CK_MedicalRecords_Status", "([Status]='Archived' OR [Status]='Active')");
+                 });
+            });
+            modelBuilder.Entity<BillService>(entity =>
+            {
+                entity.HasKey(x => new
+                {
+                    x.BillID,
+                    x.ServiceID
+                });
+
+                entity.Property(x => x.BillID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.ServiceID)
+                    .HasColumnType("nchar(10)")
+                    .IsRequired();
+
+                entity.Property(x => x.Quantity)
+                    .IsRequired(false);
+
+                entity.Property(x => x.UnitPrice)
+                    .HasColumnType("decimal(10,2)")
+                    .IsRequired();
+
+                entity.Property(x => x.TotalPrice)
+                    .IsRequired(false);
+
+                entity.HasOne(x => x.bill)
+                    .WithMany(x => x.billService)
+                    .HasForeignKey(x => x.BillID)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.medicalService)
+                    .WithMany(x => x.billServices)
+                    .HasForeignKey(x => x.ServiceID)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

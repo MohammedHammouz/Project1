@@ -18,5 +18,6 @@ namespace HSMDataAccess.Entities
         public ICollection<Notifiction> notifiction { get; set; } = new List<Notifiction>();
         public ICollection<Appointment> appointment { get; set; } = new List<Appointment>();
         public ICollection<Bill> bill { get; set; } = new List<Bill>();
+        public ICollection<MedicalRecord> medicalRecord { get; set; } = new List<MedicalRecord>();
     }
 }

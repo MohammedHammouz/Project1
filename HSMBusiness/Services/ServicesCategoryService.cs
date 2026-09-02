@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HSMBusiness.Services
 {
-    public class ServicesCategoriesService
+    public class ServicesCategoryService
     {
     //    public int CategoryID { get; set; }
     //    public string CategoryName { get; set; } = null!;

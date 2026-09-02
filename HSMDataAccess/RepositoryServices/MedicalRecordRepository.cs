@@ -1,0 +1,18 @@
+﻿using HSMDataAccess.Data;
+using HSMDataAccess.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HSMDataAccess.RepositoryServices
+{
+    public class MedicalRecordRepository : GenericRepository<MedicalRecord>
+    {
+        public MedicalRecordRepository(AppDBContext context) : base(context)
+        {
+
+        }
+    }
+}

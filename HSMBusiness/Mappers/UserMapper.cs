@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace HSMBusiness.Mappers
 {
-    public class UserMapper
+    public class UserMapper 
     {
         public enum enMode { Add,Update}
+       
         public UserDTO ToDTO(User user)
         {
             return new UserDTO(user.ID,user.Name,user.Role,user.Status,user.PasswordHash,user.EmployeeID);

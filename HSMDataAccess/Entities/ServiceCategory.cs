@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.Entities
 {
-    public class ServicesCategories
+    public class ServiceCategory
     {
-        public int CategoryID { get; set; }
+        public string ID { get; set; } = null!;
         public string CategoryName { get; set; } = null!;
         public string? CategoryDescription { get; set; }
+        public virtual ICollection<MedicalService> medicalService { get; set; }
+        = new List<MedicalService>();
     }
 }

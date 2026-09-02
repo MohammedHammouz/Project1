@@ -31,7 +31,7 @@ namespace HSMAPI.Controllers
         [Route("{Id}")]
         public async Task<IActionResult> GetUserByIdAsync(string Id)
         {
-            var user = await userService.GetUseByID(Id);
+            var user = await userService.GetByID(Id);
             if (user == null)
                 return NotFound();
 

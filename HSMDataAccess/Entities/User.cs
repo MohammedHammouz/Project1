@@ -12,6 +12,7 @@
         public virtual Employee Employee { get; set; } = null!;
         public ICollection<Notifiction> notifiction { get; set; } = new List<Notifiction>();
         public ICollection<Report> report { get; set; } = new List<Report>();
+        public ICollection<AuditLog> auditLog { get; set; } = new List<AuditLog>();
 
     }
 }

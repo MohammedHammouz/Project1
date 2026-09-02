@@ -74,7 +74,7 @@ namespace HSMBusiness
             doctorEntity.ID = AddNew.ID;
             return doctorEntity.ID != "";
         }
-        private async Task<(string?, bool)> Update(string ID,DoctorDTO doctorDTO)
+        private async Task<(string?, bool)> Update(string ID, DoctorDTO doctorDTO)
         {
             Doctor? doctorEntity = await _doctor.GetByIDAsync(ID);
             var response = await resultPattern.GiveResponse(200);
@@ -86,7 +86,7 @@ namespace HSMBusiness
             doctorEntity = new DoctorMapper().ToEntity(doctorDTO,DoctorMapper.enMode.Update,doctorEntity);
             return (response.Response, await _doctor.UpdateAsync(doctorEntity));
         }
-        public async Task<(string?,bool)> Save(DoctorDTO doctorDTO=null,string ID="")
+        public async Task<(string?,bool)> Save(DoctorDTO doctorDTO =null,string ID="")
         {
             var response = await resultPattern.GiveResponse(200);
             switch (mode)

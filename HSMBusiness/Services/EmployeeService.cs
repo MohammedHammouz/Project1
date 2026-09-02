@@ -37,9 +37,9 @@ namespace HSMBusiness.Services
             employeeEntity.ID = AddNew.ID;
             return employeeEntity.ID != "";
         }
-        private async Task<(int,string?,bool)> _Update(int ID,EmployeeDTO employeeDTO)
+        private async Task<(int,string?,bool)> _Update(string ID,EmployeeDTO employeeDTO)
         {
-            var employee = await _employeeRepository.GetByID(ID);
+            var employee = await _employeeRepository.GetByIDAsync(ID);
             var response = await resultPattern.GiveResponse(200);
             if (employee == null){
                 response = await resultPattern.GiveResponse(404);
@@ -48,9 +48,9 @@ namespace HSMBusiness.Services
             employee = new EmployeeMapper().ToEntity(employeeDTO,EmployeeMapper.enMode.Update,employee);
             return (response.Status, response.Response, await _employeeRepository.UpdateAsync(employee));
         }
-        public async Task<(int,string?,bool)> Delete(int ID)
+        public async Task<(int,string?,bool)> Delete(string ID)
         {
-            var employee = await _employeeRepository.GetByID(ID);
+            var employee = await _employeeRepository.GetByIDAsync(ID);
             var response = await resultPattern.GiveResponse(200);
             if (employee == null)
             {
@@ -92,7 +92,7 @@ namespace HSMBusiness.Services
                 e =>
                 new EmployeeMapper().ToDTO(e)).ToList());
         }
-        public async Task<(int, string?, bool)> Save(EmployeeDTO employeeDTO=null,int ID=-1)
+        public async Task<(int, string?, bool)> Save(EmployeeDTO employeeDTO=null,string ID="")
         {
             var response = await resultPattern.GiveResponse(200);
             switch (Mode)

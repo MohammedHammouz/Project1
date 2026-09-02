@@ -7,16 +7,16 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace HSMDataAccess.DTOs
 {
-    public class ServicesCategoriesDTO
+    public class ServicesCategoryDTO
     {
-       public int CategoryID { get; set; }
+       public string CategoryID { get; set; }
         public string CategoryName { get; set; } = null!;
         public string? CategoryDescription { get; set; }
-        public ServicesCategoriesDTO()
+        public ServicesCategoryDTO()
         {
 
         }
-        public ServicesCategoriesDTO(int CategoryID, string CategoryName, string? CategoryDescription)
+        public ServicesCategoryDTO(string CategoryID, string CategoryName, string? CategoryDescription)
         {
             this.CategoryID = CategoryID;
             this.CategoryName = CategoryName;
