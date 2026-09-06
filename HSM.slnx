@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="./HSMAPI/HSMAPI.csproj" />
+  <Project Path="./HSMDataAccess/HSMDataAccess.csproj" />
+  <Project Path="./HSMBusiness/HSMBusiness.csproj" />
+</Solution>

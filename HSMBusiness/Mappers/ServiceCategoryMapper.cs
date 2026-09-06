@@ -20,7 +20,7 @@ namespace HSMBusiness.Mappers
             {
                 return new ServiceCategory
                 {
-                    ID = serviceCategoryDTO.ID,
+                    ID = serviceCategoryDTO.CategoryID,
                     CategoryName = serviceCategoryDTO.CategoryName,
                     CategoryDescription = serviceCategoryDTO.CategoryDescription
                 };
@@ -29,7 +29,7 @@ namespace HSMBusiness.Mappers
             {
                 return new ServiceCategory
                 {
-                    ID = serviceCategoryDTO.ID,
+                    ID = serviceCategoryDTO.CategoryID,
                     CategoryName = serviceCategoryDTO.CategoryName,
                     CategoryDescription = serviceCategoryDTO.CategoryDescription
                 };
