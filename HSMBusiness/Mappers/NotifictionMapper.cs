@@ -12,13 +12,13 @@ namespace HSMBusiness.Mappers
     {
         public enum enMode { Add, Update }
 
-        public Notifiction ToEntity(
+        public Notification ToEntity(
             NotifictionDTO notifictionDTO,
             enMode mode = enMode.Add)
         {
             if (mode == enMode.Add)
             {
-                return new Notifiction
+                return new Notification
                 {
                     ID = notifictionDTO.ID,
                     PatientID = notifictionDTO.PatientID,
@@ -32,7 +32,7 @@ namespace HSMBusiness.Mappers
             }
             else
             {
-                return new Notifiction
+                return new Notification
                 {
                     ID = notifictionDTO.ID,
                     PatientID = notifictionDTO.PatientID,
@@ -46,7 +46,7 @@ namespace HSMBusiness.Mappers
             }
         }
 
-        public NotifictionDTO ToDTO(Notifiction notifiction)
+        public NotifictionDTO ToDTO(Notification notifiction)
         {
             return new NotifictionDTO
             (

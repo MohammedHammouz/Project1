@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.RepositoryServices
 {
-    public class NotifictionRepository : GenericRepository<Notifiction>
+    public class NotifictionRepository : GenericRepository<Notification>
     {
         public NotifictionRepository(AppDBContext context) : base(context)
         {

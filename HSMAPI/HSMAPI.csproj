@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HSMBusiness\HSMBusiness.csproj" />
-    <ProjectReference Include="..\HSMDataAccess\HSMDataAccess.csproj" />
   </ItemGroup>
 
 </Project>
