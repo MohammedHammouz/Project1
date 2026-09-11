@@ -27,6 +27,7 @@ namespace HSMDataAccess.Data.Configurations
                 builder.Property(e => e.Status)
                 .HasColumnType("bit");
                 builder.Property(e => e.PersonID)
+                .HasColumnType("nchar(10)")
                 .HasMaxLength(10);
                 builder.HasOne(d => d.Person)
                  .WithOne(e => e.Patient)

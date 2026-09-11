@@ -10,6 +10,9 @@ namespace HSMDataAccess.Data.Configurations
         {
             builder.HasKey(e => e.ID);
                 builder.Property(e => e.ID)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
+                .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')")
                 .ValueGeneratedOnAdd();
                 builder.Property(e => e.Salary)
                 .HasColumnType("decimal(10, 2)")

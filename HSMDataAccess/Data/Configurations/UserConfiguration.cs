@@ -20,6 +20,9 @@ namespace HSMDataAccess.Data.Configurations
                             ("CK_Users_Status", "([Status]=(1) OR [Status]=(0))"));
                 
                 builder.Property(e => e.ID)
+                .HasColumnType("nchar(10)")
+                .HasMaxLength(10)
+                .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')")
                 .ValueGeneratedOnAdd();
                 builder.Property(e => e.Name)
                 .HasColumnType("nchar(10)")
