@@ -15,7 +15,7 @@ namespace HSMDataAccess.RepositoryServices
         {
                         
         }
-        public async Task<Employee> GetByID(int ID)
+        public async Task<Employee?> GetByID(int ID)
         {
             var entity = await _context.Set<Employee>().FirstOrDefaultAsync(e => EF.Property<int>(e, "ID") == ID);
             return entity;

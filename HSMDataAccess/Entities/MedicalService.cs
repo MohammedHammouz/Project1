@@ -15,7 +15,7 @@ namespace HSMDataAccess.Entities
         public string? Description { get; set; }
         public int? DurationMinutes { get; set; }
         public virtual ServiceCategory serviceCategory { get; set; } = null!;
-        public virtual ICollection<BillService> billServices { get; set; }
-       = new List<BillService>();
+        public virtual ICollection<MedicalServiceBill> billServices { get; set; }
+       = new List<MedicalServiceBill>();
     }
 }

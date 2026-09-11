@@ -20,6 +20,6 @@ namespace HSMDataAccess.Entities
         public decimal? InsuranceCoverage { get; set; }
         public decimal PatientResponsibility { get; set; }
         public virtual Patient patient { get; set; } = null!;
-        public ICollection<BillService> billService { get; set; } = new List<BillService>();
+        public ICollection<MedicalServiceBill> billService { get; set; } = new List<MedicalServiceBill>();
     }
 }

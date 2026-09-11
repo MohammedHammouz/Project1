@@ -31,7 +31,7 @@ namespace HSMDataAccess.Data
         public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
         public virtual DbSet<MedicalService> MedicalServices { get; set; }
         public virtual DbSet<MedicalRecord> MedicalRecords { get; set; }
-        public virtual DbSet<BillService> BillServices { get; set; }
+        public virtual DbSet<MedicalServiceBill> BillServices { get; set; }
 
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)

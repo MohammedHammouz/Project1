@@ -1,58 +1,53 @@
-﻿using HSMBusiness.Services;
-using HSMDataAccess.DTOs;
-using Microsoft.AspNetCore.Http;
+using HSMBusiness.Features.Employees.Commands.CreateEmployee;
+using HSMBusiness.Features.Employees.Commands.DeleteEmployee;
+using HSMBusiness.Features.Employees.Commands.UpdateEmployee;
+using HSMBusiness.Features.Employees.Queries.GetEmployeeById;
+using HSMBusiness.Features.Employees.Queries.GetEmployees;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HSMAPI.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class EmployeeController : ControllerBase
+    public class EmployeeController : ApiController
     {
-        //private readonly EmployeeService _employee;
-        //public EmployeeController(EmployeeService employee)
-        //{
-        //    _employee = employee;
-        //}
-        //[HttpGet("AddNewEmployee/{ID}", Name = "GetEmployeeByID")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<DoctorDTO>> GetEmployeeByID(int ID)
-        //{
-        //    if (ID <1)
-        //        return BadRequest($"Not accepted id {ID}");
-        //    var employee = await _employee.GetByID(ID);
-        //    if (employee == null)
-        //    {
-        //        return NotFound("");
-        //    }
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromServices] GetEmployeesQueryHandler handler)
+        {
+            var result = await handler.ExecuteAsync(new GetEmployeesQuery());
+            return result.Match(items => Ok(items), Problem);
+        }
 
-        //    return Ok(employee);
-        //}
-        //[HttpPost("AddNewEmployee", Name = "AddNewEmployee")]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<ActionResult<PersonDTO>> AddNewEmployee(EmployeeDTO newEmployee)
-        //{
-        //    if (newEmployee == null)
-        //    {
-        //        return NotFound("");
-        //    }
-        //    if (string.IsNullOrEmpty(newEmployee.PersonID)
-        //         )
-        //    {
-        //        return BadRequest("Invalid Person data.");
-        //    }
-        //    else
-        //    {
-        //        EmployeeService employee = new EmployeeService(_employee.employeeRepository);
-                
-                
-        //        await employee.Save();
-        //        return CreatedAtRoute("GetEmployeeByID", new { id = newEmployee.ID }, newEmployee);
-        //    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id, [FromServices] GetEmployeeByIdQueryHandler handler)
+        {
+            var result = await handler.ExecuteAsync(new GetEmployeeByIdQuery(id));
+            return result.Match(item => Ok(item), Problem);
+        }
 
-        //}
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateEmployeeCommand command, [FromServices] CreateEmployeeCommandHandler handler)
+        {
+            var result = await handler.ExecuteAsync(command);
+            return result.Match(item => CreatedAtAction(nameof(GetById), new { id = item.Id }, item), Problem);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, UpdateEmployeeCommand command, [FromServices] UpdateEmployeeCommandHandler handler)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest();
+            }
+
+            var result = await handler.ExecuteAsync(command);
+            return result.Match(item => Ok(item), Problem);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id, [FromServices] DeleteEmployeeCommandHandler handler)
+        {
+            var result = await handler.ExecuteAsync(new DeleteEmployeeCommand(id));
+            return result.Match(_ => NoContent(), Problem);
+        }
     }
 }

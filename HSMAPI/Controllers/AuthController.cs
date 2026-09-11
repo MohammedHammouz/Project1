@@ -1,111 +1,53 @@
-﻿using HSMBusiness.Services;
-using HSMDataAccess.DTOs;
-using Microsoft.AspNetCore.Http;
+using HSMBusiness.Features.Users.Commands.CreateUser;
+using HSMBusiness.Features.Users.Commands.DeleteUser;
+using HSMBusiness.Features.Users.Commands.UpdateUser;
+using HSMBusiness.Features.Users.Queries.GetUserById;
+using HSMBusiness.Features.Users.Queries.GetUsers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HSMAPI.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController(UserService userService) : ControllerBase
+    public class AuthController : ApiController
     {
-        //[HttpPost("login")]
-        //public async Task<IActionResult> Login([FromBody] UserAuthentication request)
-        //{
-        //    var isAuthenticated = await userService.AuthenticateUserAsync(request.UserName, request.PasswordHash);
-        //    if (!isAuthenticated)
-        //    {
-        //        return Unauthorized(new { message = "Invalid credentials" });
-        //    }
-
-        //    //var user = await userService.GetByUsernameAsync(request.UserName);
-        //    //var token = userService.GenerateJwtToken(user!);
-        //    return Ok(new { Token = "token" });
-        //}
-        //private readonly UserService _user;
-        //public AuthController(UserService user)
-        //{
-        //    _user = user;
-        //}
-        [HttpGet]
-        [Route("{Id}")]
-        public async Task<IActionResult> GetUserByIdAsync(string Id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id, [FromServices] GetUserByIdQueryHandler handler)
         {
-            var user = await userService.GetByID(Id);
-            if (user == null)
-                return NotFound();
-
-            return Ok(user);
+            var result = await handler.ExecuteAsync(new GetUserByIdQuery(id));
+            return result.Match(item => Ok(item), Problem);
         }
 
-        //[HttpGet]
-        //[Route("Username")]
-        //public async Task<IActionResult> GetUserByUsernameAsync(string Username)
-        //{
-        //    var user = await userService.GetByUsernameAsync(Username);
-        //    if (user == null)
-        //        return NotFound();
-
-        //    return Ok(user);
-        //}
-
-        [HttpGet]
-        [Route("All")]
-        public async Task<IActionResult> GetAllUsers()
+        [HttpGet("All")]
+        public async Task<IActionResult> GetAll([FromServices] GetUsersQueryHandler handler)
         {
-            var usersList = await userService.GetAll();
-            if (usersList == null)
-                return NotFound();
-
-            return Ok(usersList);
+            var result = await handler.ExecuteAsync(new GetUsersQuery());
+            return result.Match(items => Ok(items), Problem);
         }
 
-        [HttpPost]
-        [Route("Create")]
-        public async Task<IActionResult> CreateUser(UserDTO user)
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create(CreateUserCommand command, [FromServices] CreateUserCommandHandler handler)
         {
-            if (user == null)
-                return BadRequest();
-
-            userService.Mode = UserService.enMode.Add;
-            var result = await userService.Save(user);
-
-            if (!result)
-                return BadRequest();
-
-            return Ok(new { Message = "User created successfully" });
+            var result = await handler.ExecuteAsync(command);
+            return result.Match(item => CreatedAtAction(nameof(GetById), new { id = item.Id }, item), Problem);
         }
 
-        [HttpPut]
-        [Route("{ID}")]
-        public async Task<IActionResult> UpdateUser(string ID, UserDTO user)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, UpdateUserCommand command, [FromServices] UpdateUserCommandHandler handler)
         {
-            if (user == null || ID is null || ID is "")
+            if (id != command.Id)
+            {
                 return BadRequest();
+            }
 
-            userService.Mode = UserService.enMode.Update;
-            var result = await userService.Save(user, ID);
-
-            if (!result)
-                return BadRequest();
-
-
-            return Ok(new { Message = "User updated successfully" });
+            var result = await handler.ExecuteAsync(command);
+            return result.Match(item => Ok(item), Problem);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id, [FromServices] DeleteUserCommandHandler handler)
         {
-            if (id is null || id is "")
-                return BadRequest();
-
-            var result = await userService.Delete(id);
-
-            if (!result)
-                return BadRequest();
-
-            return Ok(new { Message = "User deleted successfully" });
+            var result = await handler.ExecuteAsync(new DeleteUserCommand(id));
+            return result.Match(_ => NoContent(), Problem);
         }
     }
 }

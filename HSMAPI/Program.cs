@@ -1,5 +1,10 @@
+using FluentValidation;
 using HSMBusiness;
-using HSMBusiness.Services;
+using HSMBusiness.Features.Doctors.Commands.CreateDoctor;
+using HSMBusiness.Features.Doctors.Commands.DeleteDoctor;
+using HSMBusiness.Features.Doctors.Commands.UpdateDoctor;
+using HSMBusiness.Features.Doctors.Queries.GetDoctorById;
+using HSMBusiness.Features.Doctors.Queries.GetDoctors;
 using HSMDataAccess.Data;
 using HSMDataAccess.DTOs;
 using HSMDataAccess.RepositoryServices;
@@ -26,14 +31,34 @@ namespace HSMAPI
             }
             builder.Services.AddDbContext<AppDBContext>(options =>
                 options.UseSqlServer(connectionString));
-            builder.Services.AddScoped<PersonRepository>();
-            builder.Services.AddScoped<PersonService>();
+            builder.Services.AddScoped<AppointmentRepository>();
+            builder.Services.AddScoped<AuditLogRepository>();
+            builder.Services.AddScoped<BillRepository>();
+            builder.Services.AddScoped<DepartmentRepository>();
             builder.Services.AddScoped<DoctorRepository>();
-            builder.Services.AddScoped<DoctorService>();
             builder.Services.AddScoped<EmployeeRepository>();
-            builder.Services.AddScoped<EmployeeService>();
+            builder.Services.AddScoped<MedicalRecordRepository>();
+            builder.Services.AddScoped<MedicalServiceRepository>();
+            builder.Services.AddScoped<MedicalServiceBillRepository>();
+            builder.Services.AddScoped<NotifictionRepository>();
+            builder.Services.AddScoped<PatientRepository>();
+            builder.Services.AddScoped<PersonRepository>();
+            builder.Services.AddScoped<ReportRepository>();
+            builder.Services.AddScoped<ServicesCategoryRepository>();
             builder.Services.AddScoped<UserRepository>();
-            builder.Services.AddScoped<UserService>();
+
+            var handlerAssembly = typeof(CreateDoctorCommand).Assembly;
+
+            var handlerTypes = handlerAssembly.GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract
+                    && (t.Name.EndsWith("CommandHandler") || t.Name.EndsWith("QueryHandler")));
+
+            foreach (var handlerType in handlerTypes)
+            {
+                builder.Services.AddScoped(handlerType);
+            }
+
+            builder.Services.AddValidatorsFromAssembly(handlerAssembly);
             var app = builder.Build();
             
             // Configure the HTTP request pipeline.

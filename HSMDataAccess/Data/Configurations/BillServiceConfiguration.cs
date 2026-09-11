@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace HSMDataAccess.Data.Configurations
 {
-    public class BillServiceConfiguration : IEntityTypeConfiguration<BillService>
+    public class BillServiceConfiguration : IEntityTypeConfiguration<MedicalServiceBill>
     {
-        public void Configure(EntityTypeBuilder<BillService> builder)
+        public void Configure(EntityTypeBuilder<MedicalServiceBill> builder)
         {
             builder.HasKey(x => new
                 {
