@@ -103,6 +103,16 @@ namespace HSMBusiness.Services
             }
             return (response.Status, response.Response, response.IsSuccess);
         }
+        public async Task<bool> IsPatientExist(string ID)
+        {
+
+            var patient = await GetByID(ID);
+            if (patient.patientDTO1 == null)
+            {
+                return false;
+            }
+            return true;
+        }
         public async Task<bool> IsPatientExist(Appointment appointmentEntity, AppointmentDTO appointmentDTO)
         {
 
