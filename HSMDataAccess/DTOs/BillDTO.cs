@@ -8,7 +8,7 @@ namespace HSMDataAccess.DTOs
 {
     public class BillDTO
     {
-        public string BillID { get; set; } = null!;
+        public string ID { get; set; } = null!;
         public string PatientID { get; set; } = null!;
         public string Status { get; set; } = null!;
         public DateTime? Date { get; set; }
@@ -27,7 +27,7 @@ namespace HSMDataAccess.DTOs
     decimal? partialPaymentAmount,DateTime? dueDate,string invoice,decimal grossAmount,
     decimal? discount,decimal? insuranceCoverage,decimal patientResponsibility)
         {
-            BillID = billID;
+            ID = billID;
             PatientID = patientID;
             Status = status;
             Date = date;

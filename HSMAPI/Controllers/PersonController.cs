@@ -1,4 +1,5 @@
-﻿using HSMBusiness.Services;
+﻿using HSMBusiness.Pattern;
+using HSMBusiness.Services;
 using HSMDataAccess.DTOs;
 using HSMDataAccess.RepositoryServices;
 using Microsoft.AspNetCore.Authorization;
@@ -8,117 +9,180 @@ using System.Linq;
 using System.Security.Claims;
 namespace HSMAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/PersonController")]
     [ApiController]
-    public class PersonController : ControllerBase
+    public class PersonController(PersonService personService) : ControllerBase
     {
-        //private readonly PersonService _person;
-        //public PersonController(PersonService person)
-        //{
-        //    _person = person;
-        //}
-        //[HttpGet("AllPeople", Name = "GetAllPeople")]
+        [HttpGet]
+        [Route("{Id}", Name = "GetPersonByIdAsync")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetPersonByIdAsync(string Id)
+        {
+            var person = await personService.GetByID(Id);
+            if (Id == "")
+            {
+                return BadRequest($"{person.Status},{person.Response}");
+            }
+            if (person.personDTO1 == null)
+            {
+                return NotFound($"{person.Response},{person.Response}");
+            }
 
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<PersonDTO>> GetAllStudents()
-        //{
-        //    var people =await _person.GetAll();
-        //    if (people == null)
-        //    {
-        //        return NotFound("");
-        //    }
-        //    return Ok(people);
-        //}
-        //[HttpGet("{ID}", Name = "GetPersonByID")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<PersonDTO>> GetPersonByID(string ID)
-        //{
-        //    if (ID=="")
-        //        return BadRequest($"Not accepted id {ID}");
-        //    var person =await _person.GetByID(ID);
-        //    if (person == null)
-        //    {
-        //        return NotFound("");
-        //    }
-            
-        //    return Ok(person);
-        //}
-        
-        //[HttpPost("AddNew",Name = "AddNewPerson")]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<ActionResult<PersonDTO>> AddNewPerson(PersonDTO newPerson)
-        //{
-        //    if (string.IsNullOrEmpty(newPerson.Name) || string.IsNullOrEmpty(newPerson.ContactNumber)||
-        //        string.IsNullOrEmpty(newPerson.Email)|| string.IsNullOrEmpty(newPerson.Gender)|| 
-        //         newPerson.DateOfBirth==null)
-        //    {
-        //        return BadRequest("Invalid Person data.");
-        //    }
-        //    else
-        //    {   
-        //        PersonService person = new PersonService(_person.personRepository1);
-        //        person.Name = newPerson.Name;
-        //        person.Address = newPerson.Address;
-        //        person.DateOfBirth = newPerson.DateOfBirth;
-        //        person.Email = newPerson.Email;
-        //        person.Gender = newPerson.Gender;
-        //        person.ContactNumber = newPerson.ContactNumber;
-        //        await person.Save();
-        //        return CreatedAtRoute("GetPersonByID", new { id = newPerson.ID }, newPerson);
-        //    }
+            return Ok(new { response = person.Response, IsSuccess = person.IsSuccess, employeeDTO = person.personDTO1 });
+        }
+        [HttpGet]
+        [Route("All", Name = "GetAllPeople")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAllPeople()
+        {
+            var peopleList = await personService.GetAll();
+            if (peopleList.peopleList == null)
+            {
+                return NotFound($"{peopleList.Response},{peopleList.Response}");
+            }
+            return Ok(new
+            {
+                status = peopleList.Status,
+                response = peopleList.Response,
+                people = peopleList.peopleList,
 
-        //}
-        //[HttpPut("{ID}", Name = "UpdatePerson")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<PersonDTO>> UpdatePerson(string ID, PersonDTO updatedPerson)
-        //{
-        //    if (string.IsNullOrEmpty(updatedPerson.Name) || string.IsNullOrEmpty(updatedPerson.ContactNumber) ||
-        //        string.IsNullOrEmpty(updatedPerson.Email) || string.IsNullOrEmpty(updatedPerson.Gender) ||
-        //         updatedPerson.DateOfBirth == null)
-        //    {
-        //        return BadRequest("");
-        //    }
-        //    //var student = StudentDataSimulation.students.FirstOrDefault(student => student.studentID==id);
-        //    PersonService person = new PersonService(_person.personRepository1,PersonService.enMode.Update);
-        //    PersonDTO person1 =await _person.GetByID(ID);
-        //    if (person1 == null)
-        //    {
-        //        return NotFound("Person is not found");
-        //    }
-        //    person.ID = ID;
-        //    person.Name = updatedPerson.Name;
-        //    person.Address = updatedPerson.Address;
-        //    person.DateOfBirth = updatedPerson.DateOfBirth;
-        //    person.Email = updatedPerson.Email;
-        //    person.Gender = updatedPerson.Gender;
-        //    person.ContactNumber = updatedPerson.ContactNumber;
-            
-        //    await person.Save();
+            });
+        }
+        [HttpPost]
+        [Route("Create", Name = "CreatePerson")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CreatePerson(PersonDTO people)
+        {
+            var response = await new ResultPatern().GiveResponse(200, null);
+            if (people == null)
+            {
+                response = await new ResultPatern().GiveResponse(404, null);
+                return NotFound(new
+                {
+                    status = response.Status,
+                    response = response.Response,
+                    isSuccess = response.IsSuccess,
+                    errors = response.Errors
+                });
+            }
+            if (string.IsNullOrWhiteSpace(people.Name) || string.IsNullOrWhiteSpace(people.ContactNumber)|| string.IsNullOrWhiteSpace(people.Email)|| 
+                string.IsNullOrWhiteSpace(people.Gender) || people.ID == "")
+            {
+
+                response = await new ResultPatern().GiveResponse(400, null);
+                return BadRequest(new
+                {
+                    status = response.Status,
+                    response = response.Response,
+                    isSuccess = response.IsSuccess,
+                    errors = response.Errors
+                });
+
+            }
+
+            personService.Mode = PersonService.enMode.Add;
+            var result = await personService.Save(people.ID,people);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess
+                });
+            }
+            return Ok(CreatedAtRoute("GetPersonByIdAsync", new { id = people.ID }, people));
+
+        }
+        [HttpPut]
+        [Route("{ID}", Name = "UpdatePerson")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdatePerson(string ID, PersonDTO people)
+        {
+
+            var response = await new ResultPatern().GiveResponse(200, null);
+            if ((string.IsNullOrWhiteSpace(people.Name) || string.IsNullOrWhiteSpace(people.ContactNumber) || string.IsNullOrWhiteSpace(people.Email) ||
+                string.IsNullOrWhiteSpace(people.Gender) || ID == ""))
+            {
+
+                response = await new ResultPatern().GiveResponse(400, null);
+                return BadRequest(new
+                {
+                    status = response.Status,
+                    response = response.Response,
+                    isSuccess = response.IsSuccess,
+                    errors = response.Errors
+                });
+
+            }
+
+            var CurrAppointment = await personService.GetByID(ID);
+            if (CurrAppointment.personDTO1 == null)
+            {
+
+                return NotFound(new
+                {
+                    status = CurrAppointment.Status,
+                    response = CurrAppointment.Response,
+                    isSuccess = CurrAppointment.IsSuccess
+                });
+            }
            
-        //    return Ok(person.personDTO);
-        //}
-        //[HttpDelete("DeletePerson/{ID}", Name = "DeletePerson")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult> DeletePerson(string ID)
-        //{
-        //    if (ID == "")
-        //    {
-        //        return NotFound("Personid is not found");
-        //    }
-        //    bool person =await _person.Delete(ID);
-        //    if (!person)
-        //    {
-        //        return BadRequest("Person is not found");
-        //    }
-        //    return Ok($"Person with ID {ID} has been deleted.");
-        //}
+
+           personService.Mode = PersonService.enMode.Add;
+            var result = await personService.Save(ID,people);
+
+            if (!result.IsSuccess)
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess
+
+                });
+            return Ok(new
+            {
+                status = result.Status,
+                response = result.Response,
+                isSuccess = result.IsSuccess
+            });
+        }
+
+        [HttpDelete]
+        [Route("Delete/{id}", Name = "DeletePerson")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeletePerson(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("ID is empty or not found");
+
+            var result = await personService.Delete(id);
+
+            if (!result.IsSuccess)
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess
+                });
+
+            return Ok(new
+            {
+                status = result.Status,
+                response = result.Response,
+                isSuccess = result.IsSuccess
+            });
+        }
     }
 }

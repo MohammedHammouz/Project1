@@ -16,7 +16,7 @@ namespace HSMBusiness.Mappers
             if(mode==enMode.Add)
                 return new Bill
                 {
-                    ID = billDTO.BillID,
+                    ID = billDTO.ID,
                     PatientID=billDTO.PatientID,
                     Status =billDTO.Status,
                     Date=billDTO.Date,

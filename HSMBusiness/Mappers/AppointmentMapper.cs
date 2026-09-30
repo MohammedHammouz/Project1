@@ -24,7 +24,7 @@ namespace HSMBusiness.Mappers
             {
                 return new Appointment
                 {
-                    ID = appointmentDTO.ID,
+                    
                     PatientID=appointmentDTO.PatientID,
                     DoctorID=appointmentDTO.DoctorID,
                     Date=appointmentDTO.Date,

@@ -14,7 +14,7 @@ namespace HSMBusiness.Services
     public class BillService
     {
         private readonly BillRepository _repository;
-
+        private readonly PersonService _personService;
         public enum enMode { Add = 0, Update }
         public enMode Mode = enMode.Add;
         ResultPatern resultPattern = new ResultPatern();
@@ -25,29 +25,30 @@ namespace HSMBusiness.Services
                 return _repository;
             }
         }
-        public BillService(BillRepository repository,enMode mode = enMode.Add)
+        public BillService(BillRepository repository,PersonService personService,enMode mode = enMode.Add)
         {
             _repository = repository;
+            _personService = personService;
             Mode = mode;
         }
-        public async Task<(string?, bool, List<BillDTO>)> GetAll()
+        public async Task<(int Status,string? Response, bool IsSuccess, List<BillDTO>? billsList)> GetAll()
         {
             var bills = await _repository.GetAllAsync();
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (bills == null)
             {
-                response = await resultPattern.GiveResponse(404);
-                return (response.Response, response.IsSuccess, null);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                return (response.Status,response.Response, response.IsSuccess, null);
             }
-            return (response.Response, response.IsSuccess, bills.Select(b=>new BillMapper().ToDTO(b)).ToList());
+            return (response.Status, response.Response, response.IsSuccess, bills.Select(b=>new BillMapper().ToDTO(b)).ToList());
         }
-        public async Task<(int,string,bool,BillDTO)>GetByID(string ID)
+        public async Task<(int Status,string Response,bool IsSuccess,BillDTO billDTO1)>GetByID(string ID)
         {
             var bill = await _repository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (bill == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status,response.Response, response.IsSuccess, new BillDTO());
             }
             return (response.Status, response.Response, response.IsSuccess, new BillMapper().ToDTO(bill));
@@ -55,6 +56,10 @@ namespace HSMBusiness.Services
         private async Task<bool>_Add(BillDTO billDTO)
         {
             var bill = new BillMapper().ToEntity(billDTO);
+            if(! await _personService.IsPersonExist(bill.PatientID))
+            {
+                return false;
+            }
             var AddNew = await _repository.AddAsync(bill);
             bill.ID = AddNew.ID;
             return bill.ID != "";
@@ -62,35 +67,41 @@ namespace HSMBusiness.Services
         private async Task<(int,string?,bool)>_Update(BillDTO billDTO,string ID)
         {
             var bill = await _repository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
+            if (!await _personService.IsPersonExist(bill.PatientID))
+            {
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess);
+            }
             if (bill == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
             bill = new BillMapper().ToEntity(billDTO);
-            return (response.Status, response.Response, await _repository.UpdateAsync(bill));
+            await _repository.UpdateAsync(bill);
+            return (response.Status, response.Response, response.IsSuccess);
         }
-        public async Task<(int,string?,bool)>Delete(string ID)
+        public async Task<(int Status,string? Response,bool IsSuccess)>Delete(string ID)
         {
             var bill = await _repository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (bill == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
             bool IsDeleted = await _repository.DeleteAsync(bill);
             if (!IsDeleted)
             {
-                response = await resultPattern.GiveResponse(500);
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
             return (response.Status, response.Response, response.IsSuccess);
         }
-        public async Task<(int, string?, bool)>Save(BillDTO billDTO,string ID = "")
+        public async Task<(int Status, string?Response, bool IsSuccess)>Save(BillDTO billDTO,string ID = "")
         {
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             switch (Mode)
             {
                 case enMode.Add:
@@ -100,7 +111,7 @@ namespace HSMBusiness.Services
                     }
                     else
                     {
-                        response = await resultPattern.GiveResponse(500);
+                        response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                     }
                     return (response.Status, response.Response, response.IsSuccess);
                 case enMode.Update:

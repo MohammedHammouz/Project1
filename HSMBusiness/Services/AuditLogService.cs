@@ -46,11 +46,11 @@ namespace HSMBusiness.Services
         {
             var CurrentAuditLog = await _auditLog.GetByIDAsync(ID);
 
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (CurrentAuditLog == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (response.Status, response.Response, response.IsSuccess);
             }
@@ -62,7 +62,7 @@ namespace HSMBusiness.Services
 
         public async Task<(int, string?, bool)> Save(AuditLogDTO auditLogDTO,string ID = "")
         {
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             switch (_mode)
             {
@@ -75,7 +75,7 @@ namespace HSMBusiness.Services
                     else
                     {
                         response =
-                            await resultPattern.GiveResponse(400);
+                            await resultPattern.GiveResponse(400, new Dictionary<string, string>());
                     }
 
                     return ( response.Status,response.Response,response.IsSuccess);
@@ -85,7 +85,7 @@ namespace HSMBusiness.Services
                     return await Update(ID, auditLogDTO);
             }
 
-            response =await resultPattern.GiveResponse(500);
+            response =await resultPattern.GiveResponse(500, new Dictionary<string, string>());
 
             return ( response.Status, response.Response,  response.IsSuccess);
         }
@@ -94,11 +94,11 @@ namespace HSMBusiness.Services
         {
             var auditLogs = await _auditLog.GetAllAsync();
 
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (auditLogs == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return ( response.Status, response.Response, response.IsSuccess, null);
             }
@@ -111,11 +111,11 @@ namespace HSMBusiness.Services
         {
             var auditLog = await _auditLog.GetByIDAsync(ID);
 
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (auditLog == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return ( response.Status, response.Response, response.IsSuccess, new AuditLogDTO( "", "", "", "", DateTime.Now, null ));
             }
@@ -128,11 +128,11 @@ namespace HSMBusiness.Services
         {
             var auditLog =await _auditLog.GetByIDAsync(ID);
 
-            var response =await resultPattern.GiveResponse(200);
+            var response =await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (auditLog == null)
             {
-                response =await resultPattern.GiveResponse(404);
+                response =await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (response.Status,response.Response,response.IsSuccess);
             }
@@ -141,7 +141,7 @@ namespace HSMBusiness.Services
 
             if (!IsDeleted)
             {
-                response =await resultPattern.GiveResponse(400);
+                response =await resultPattern.GiveResponse(400, new Dictionary<string, string>());
 
                 return (response.Status,response.Response,response.IsSuccess
                 );

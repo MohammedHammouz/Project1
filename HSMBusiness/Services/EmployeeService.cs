@@ -17,6 +17,7 @@ namespace HSMBusiness.Services
         public enum enMode { Add = 0, Update }
         public enMode Mode = enMode.Add;
         private readonly EmployeeRepository _employeeRepository;
+        private readonly PersonService _personService;
         public EmployeeRepository employeeRepository
         {
             get
@@ -24,15 +25,21 @@ namespace HSMBusiness.Services
                 return _employeeRepository;
             }
         }
-        public EmployeeService( EmployeeRepository employeeRepository, enMode mode = enMode.Add)
+       
+        public EmployeeService( EmployeeRepository employeeRepository,PersonService personService, enMode mode = enMode.Add)
         {
             _employeeRepository = employeeRepository;
+            _personService = personService;
             Mode = mode;
         }
         
         private async Task<bool> _AddNew(EmployeeDTO employeeDTO)
         {
             var employeeEntity = new EmployeeMapper().ToEntity(employeeDTO);
+            if(!await _personService.IsPersonExist(employeeEntity.PersonID))
+            {
+                return false;
+            }
             var AddNew = await _employeeRepository.AddAsync(employeeEntity);
             employeeEntity.ID = AddNew.ID;
             return employeeEntity.ID != "";
@@ -40,61 +47,63 @@ namespace HSMBusiness.Services
         private async Task<(int,string?,bool)> _Update(string ID,EmployeeDTO employeeDTO)
         {
             var employee = await _employeeRepository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (employee == null){
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
             employee = new EmployeeMapper().ToEntity(employeeDTO,EmployeeMapper.enMode.Update,employee);
-            return (response.Status, response.Response, await _employeeRepository.UpdateAsync(employee));
+            await _employeeRepository.UpdateAsync(employee);
+            return (response.Status, response.Response, response.IsSuccess);
         }
-        public async Task<(int,string?,bool)> Delete(string ID)
+        public async Task<(int Status,string? Response,bool IsSuccess)> Delete(string ID)
         {
             var employee = await _employeeRepository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (employee == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status,response.Response,response.IsSuccess);
             }
             bool IsDeleted= await _employeeRepository.DeleteAsync(employee);
             if (!IsDeleted)
             {
-                response = await resultPattern.GiveResponse(500);
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
             return (response.Status, response.Response, response.IsSuccess);
         }
-        public async Task<(int, string? ,EmployeeDTO)> GetByID(string ID)
+        public async Task<(int Status, string? Response ,EmployeeDTO? employeeDTO1,bool IsSuccess)> GetByID(string ID)
         {
            
             var employee = await _employeeRepository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (employee == null)
             {
-                response = await resultPattern.GiveResponse(404);
-                return (response.Status, response.Response, new EmployeeDTO());
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                return (response.Status, response.Response,null,response.IsSuccess);
             }
             
-            return (response.Status, response.Response, new EmployeeDTO(ID, employee.PersonID, employee.Salary,employee.HireDate,employee.IsActive));
+            return (response.Status, response.Response, new EmployeeDTO(ID, employee.PersonID, employee.Salary,employee.HireDate,employee.IsActive), response.IsSuccess);
         }
        
-        public async Task<(int, string?, List<EmployeeDTO>)> GetAll()
+        public async Task<(int Status, string? Response, List<EmployeeDTO>? employeesList)> GetAll()
         {
             var employees = await _employeeRepository.GetAllAsync();
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (employees == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, null);
             }
             return (response.Status, response.Response, employees.Select(
                 e =>
                 new EmployeeMapper().ToDTO(e)).ToList());
         }
-        public async Task<(int, string?, bool)> Save(EmployeeDTO employeeDTO=null,string ID="")
+        public async Task<(int Status, string? Response, bool IsSuccess)> Save(EmployeeDTO employeeDTO=null,string ID="")
         {
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             switch (Mode)
             {
                 case enMode.Update:
@@ -108,11 +117,11 @@ namespace HSMBusiness.Services
                     }
 
                     else{
-                        response = await resultPattern.GiveResponse(500);
+                        response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                         return (response.Status, response.Response, response.IsSuccess);
                     }
             }
-            response = await resultPattern.GiveResponse(500);
+            response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
             return (response.Status, response.Response, response.IsSuccess);
         }
     }

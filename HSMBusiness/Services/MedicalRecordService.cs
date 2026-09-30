@@ -54,12 +54,12 @@ namespace HSMBusiness.Services
                 await _medicalRecord.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (CurrentMedicalRecord == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -86,7 +86,7 @@ namespace HSMBusiness.Services
             string ID = "")
         {
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             switch (_mode)
             {
@@ -99,7 +99,7 @@ namespace HSMBusiness.Services
                     else
                     {
                         response =
-                            await resultPattern.GiveResponse(400);
+                            await resultPattern.GiveResponse(400, new Dictionary<string, string>());
                     }
 
                     return (
@@ -114,7 +114,7 @@ namespace HSMBusiness.Services
             }
 
             response =
-                await resultPattern.GiveResponse(500);
+                await resultPattern.GiveResponse(500, new Dictionary<string, string>());
 
             return (
                 response.Status,
@@ -127,19 +127,19 @@ namespace HSMBusiness.Services
             int,
             string?,
             bool,
-            List<MedicalRecordDTO>
+            List<MedicalRecordDTO>?
         )> GetAll()
         {
             var medicalRecords =
                 await _medicalRecord.GetAllAsync();
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (medicalRecords == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -179,12 +179,12 @@ namespace HSMBusiness.Services
                 await _medicalRecord.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (medicalRecord == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -226,12 +226,12 @@ namespace HSMBusiness.Services
                 await _medicalRecord.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (medicalRecord == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -246,7 +246,7 @@ namespace HSMBusiness.Services
             if (!IsDeleted)
             {
                 response =
-                    await resultPattern.GiveResponse(400);
+                    await resultPattern.GiveResponse(400, new Dictionary<string, string>());
 
                 return (
                     response.Status,

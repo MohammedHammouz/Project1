@@ -1,87 +1,187 @@
 ﻿using HSMBusiness;
+using HSMBusiness.Erorrs;
+using HSMBusiness.Pattern;
+using HSMBusiness.Services;
 using HSMDataAccess.DTOs;
+using HSMDataAccess.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HSMAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/DoctorController")]
     [ApiController]
-    public class DoctorController : ControllerBase
+    public class DoctorController(DoctorService doctorService,DoctorError doctorError) : ControllerBase
     {
-        //private readonly DoctorService _doctor;
-        //public DoctorController(DoctorService doctor)
-        //{
-        //    _doctor = doctor;
-        //}
-        //[HttpGet("AllDoctors", Name = "GetAllDoctors")]
+        [HttpGet]
+        [Route("{Id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDoctorByIdAsync(string Id)
+        {
+            var doctor = await doctorService.GetDoctorByID(Id);
+            if (Id == "")
+            {
+                return BadRequest($"{doctor.Status},{doctor.Response},{doctor.IsSuccess},{doctor.errors}");
+            }
+            if (doctor.doctorDTO1 == null)
+            {
+                return NotFound($"{doctor.Response},{doctor.Response},{doctor.errors}");
+            }
 
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult> GetAllDoctors()
-        //{
-        //    var doctors = await _doctor.GetAll();
-        //    if (doctors == null)
-        //    {
-        //        return NotFound("");
-        //    }
-        //    return Ok(doctors);
-        //}
-        //[HttpGet("AddNewDoctor/{ID}", Name = "GetDoctorByID")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<DoctorDTO>> GetDoctorByID(string ID)
-        //{
-        //    if (ID == "")
-        //        return BadRequest($"Not accepted id {ID}");
-        //    var doctor = await _doctor.GetDoctorByID(ID);
-        //    if (doctor == null)
-        //    {
-        //        return NotFound("");
-        //    }
+            return Ok(doctor);
+        }
+        [HttpGet]
+        [Route("All",Name = "GetAllDoctors")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAllDoctors()
+        {
+            var usersList = await doctorService.GetAll();
+            if (usersList.Item4 == null)
+            {
+                return NotFound($"{usersList.Response},{usersList.Response}");
+            }
+            return Ok(new
+            {
+                status = usersList.Status,
+                response = usersList.Response,
+                doctors = usersList.doctorsList
+            });
+        }
+        [HttpPost]
+        [Route("Create",Name = "CreateDoctor")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CreateDoctor(DoctorDTO doctor)
+        {
+            if (string.IsNullOrWhiteSpace(doctor.DepartmentID) || string.IsNullOrWhiteSpace(doctor.Specialization) )
+            {
+                var errors = await doctorError.ValidateDoctor(doctor);
+                if (errors.Count > 0)
+                {
+                    var response = await new ResultPatern().GiveResponse(400, errors);
+                    return NotFound(new
+                    {
+                        status = response.Status,
+                        response = response.Response,
+                        isSuccess = response.IsSuccess,
+                        errors = response.Errors
+                    });
+                }
+            }
 
-        //    return Ok(doctor);
-        //}
-        //[HttpPost("AddNewDoctor", Name = "AddNew")]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<ActionResult<PersonDTO>> AddNew(DoctorDTO newDoctor)
-        //{
-        //    if (newDoctor == null)
-        //    {
-        //        return NotFound("");
-        //    }
-        //    if (string.IsNullOrEmpty(newDoctor.DepartmentID) || string.IsNullOrEmpty(newDoctor.UserID) ||
-        //          string.IsNullOrEmpty(newDoctor.Specialization) || newDoctor.Status==false
-        //         )
-        //    {
-        //        return BadRequest("Invalid Person data.");
-        //    }
-        //    else
-        //    {
-        //        DoctorService doctor = new DoctorService(_doctor.doctorRepository);
-        //        doctor.DepartmentID = newDoctor.DepartmentID;
-        //        doctor.Status = newDoctor.Status;
-        //        doctor.UserID = newDoctor.UserID;
-        //        doctor.Specialization = newDoctor.Specialization;
-        //        await doctor.Save();
-        //        return CreatedAtRoute("GetDoctorByID", new { id = newDoctor.ID }, newDoctor);
-        //    }
+            doctorService.mode = DoctorService.enMode.Add;
+            var result = await doctorService.Save(doctor,doctor.ID);
 
-        //}
-        //[HttpDelete("DeleteDoctor/{ID}", Name = "DeleteDoctor")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<IActionResult>DeleteDoctor(string ID)
-        //{
-        //    if (ID == "")
-        //        return NotFound("");
-        //    bool IsFound = await _doctor.Delete(ID);
-        //    if (!IsFound)
-        //        return BadRequest("");
-        //    return Ok($"Deleted SuccessFully {ID}");
-        //}
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess,
+                    errors = result.errors
+                });
+            }
+            return Ok(new
+            {
+                status = result.Status,
+                response = result.Response,
+                isSuccess = result.IsSuccess,
+                errors = result.errors
+            });
+
+        }
+        [HttpPut]
+        [Route("{ID}",Name = "UpdateDoctor")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateDoctor(string ID, DoctorDTO doctor)
+        {
+            if (string.IsNullOrEmpty(ID))
+            {
+                var errors = await doctorError.ValidateDoctor(doctor);
+                var response = await new ResultPatern().GiveResponse(400, errors);
+                return BadRequest(new
+                {
+                    status = response.Status,
+                    response = response.Response,
+                    isSuccess = response.IsSuccess,
+                    errors = response.Errors
+                });
+            }
+            var CurrDoctor = await doctorService.GetDoctorByID(ID);
+            if (CurrDoctor.doctorDTO1 == null)
+            {
+                return NotFound(new
+                {
+                    status = CurrDoctor.Status,
+                    response = CurrDoctor.Response,
+                    isSuccess = CurrDoctor.IsSuccess,
+                    errors = CurrDoctor.errors
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(doctor.DepartmentID) || string.IsNullOrWhiteSpace(doctor.Specialization))
+            {
+                var errors = await doctorError.ValidateDoctor(doctor);
+                if (errors.Count > 0)
+                {
+                    var response = await new ResultPatern().GiveResponse(400, errors);
+                    return BadRequest(new
+                    {
+                        status = response.Status,
+                        response = response.Response,
+                        isSuccess = response.IsSuccess,
+                        errors = response.Errors
+                    });
+                }
+            }
+            doctorService.mode = DoctorService.enMode.Add;
+            var result = await doctorService.Save(doctor, ID);
+            if (!result.IsSuccess)
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess,
+                    errors = result.errors
+                });
+            return Ok(CreatedAtRoute("GetDoctorByIdAsync", new { id = doctor.ID }, doctor));
+        }
+
+        [HttpDelete]
+        [Route("Delete/{id}", Name = "DeleteDoctor")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteDoctor(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return NotFound("ID is not found");
+
+            var result = await doctorService.Delete(id);
+
+            if (!result.IsSuccess)
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess,
+                    errors = result.errors
+                });
+
+            return Ok(new
+            {
+                status = result.Status,
+                response = result.Response,
+                isSuccess = result.IsSuccess
+            });
+        }
     }
 }

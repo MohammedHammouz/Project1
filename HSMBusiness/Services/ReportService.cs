@@ -35,14 +35,9 @@ namespace HSMBusiness.Services
 
         private async Task<bool> Add(ReportDTO reportDTO)
         {
-            var reportEntity =
-                new ReportMapper().ToEntity(reportDTO);
-
-            var AddNew =
-                await _report.AddAsync(reportEntity);
-
+            var reportEntity =  new ReportMapper().ToEntity(reportDTO);
+            var AddNew = await _report.AddAsync(reportEntity);
             reportEntity.ID = AddNew.ID;
-
             return reportEntity.ID != "";
         }
 
@@ -54,18 +49,12 @@ namespace HSMBusiness.Services
                 await _report.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (CurrentReport == null)
             {
-                response =
-                    await resultPattern.GiveResponse(404);
-
-                return (
-                    response.Status,
-                    response.Response,
-                    response.IsSuccess
-                );
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                return ( response.Status, response.Response,  response.IsSuccess) ;
             }
 
             CurrentReport =
@@ -86,7 +75,7 @@ namespace HSMBusiness.Services
             string ID = "")
         {
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             switch (_mode)
             {
@@ -99,7 +88,7 @@ namespace HSMBusiness.Services
                     else
                     {
                         response =
-                            await resultPattern.GiveResponse(400);
+                            await resultPattern.GiveResponse(400, new Dictionary<string, string>());
                     }
 
                     return (
@@ -114,7 +103,7 @@ namespace HSMBusiness.Services
             }
 
             response =
-                await resultPattern.GiveResponse(500);
+                await resultPattern.GiveResponse(500, new Dictionary<string, string>());
 
             return (
                 response.Status,
@@ -127,19 +116,19 @@ namespace HSMBusiness.Services
             int,
             string?,
             bool,
-            List<ReportDTO>
+            List<ReportDTO>?
         )> GetAll()
         {
             var reports =
                 await _report.GetAllAsync();
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (reports == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -172,64 +161,17 @@ namespace HSMBusiness.Services
             );
         }
 
-        public async Task<(
-            int,
-            string?,
-            bool,
-            ReportDTO
-        )> GetByID(string ID)
+        public async Task<( int, string?,  bool,  ReportDTO)> GetByID(string ID)
         {
-            var report =
-                await _report.GetByIDAsync(ID);
+            var report = await _report.GetByIDAsync(ID);
 
-            var response =
-                await resultPattern.GiveResponse(200);
-
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (report == null)
             {
-                response =
-                    await resultPattern.GiveResponse(404);
-
-                return (
-                    response.Status,
-                    response.Response,
-                    response.IsSuccess,
-                    new ReportDTO(
-                        "",
-                        "",
-                        DateTime.Now,
-                        "",
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                    )
-                );
+                response =  await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                return ( response.Status, response.Response, response.IsSuccess,  new ReportDTO("","",DateTime.Now,"",null,null,null,null,null,null,null,null));
             }
-
-            return (
-                response.Status,
-                response.Response,
-                response.IsSuccess,
-                new ReportDTO(
-                    report.ID,
-                    report.Type,
-                    report.GeneratedOn,
-                    report.GeneratedBy,
-                    report.AppointmentCount,
-                    report.Revenue,
-                    report.PaymentsReceived,
-                    report.PendingPayments,
-                    report.Metrics,
-                    report.ExportFormat,
-                    report.Status,
-                    report.Notes
-                )
-            );
+            return (response.Status,response.Response,response.IsSuccess,new ReportMapper().ToDTO(report));
         }
 
         public async Task<(int, string?, bool)> Delete(string ID)
@@ -238,12 +180,12 @@ namespace HSMBusiness.Services
                 await _report.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (report == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -258,7 +200,7 @@ namespace HSMBusiness.Services
             if (!IsDeleted)
             {
                 response =
-                    await resultPattern.GiveResponse(400);
+                    await resultPattern.GiveResponse(400, new Dictionary<string, string>());
 
                 return (
                     response.Status,

@@ -23,7 +23,7 @@ namespace HSMBusiness.Mappers
             {
                 return new Employee
                 {
-                    ID = employeeDTO.ID,
+                    
                     PersonID = employeeDTO.PersonID,
                     Salary = employeeDTO.Salary,
                     HireDate = employeeDTO.HireDate,

@@ -1,6 +1,8 @@
 ﻿using HSMBusiness.Services;
 using HSMDataAccess.DTOs;
+using HSMDataAccess.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HSMAPI.Controllers
@@ -32,8 +34,13 @@ namespace HSMAPI.Controllers
         public async Task<IActionResult> GetUserByIdAsync(string Id)
         {
             var user = await userService.GetByID(Id);
-            if (user == null)
-                return NotFound();
+            if (Id == "")
+            {
+                return BadRequest($"{user.Response},{user.Response},{user.errors}");
+            }
+            if (user.userDTO == null) {
+                return NotFound($"{user.Response},{user.Response},{user.errors}");
+            }
 
             return Ok(user);
         }
@@ -54,26 +61,44 @@ namespace HSMAPI.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var usersList = await userService.GetAll();
-            if (usersList == null)
-                return NotFound();
-
-            return Ok(usersList);
+            if (usersList.Item4 == null){
+                return NotFound($"{usersList.Response},{usersList.Response},{usersList.errors}");
+            }
+            return Ok(new
+            {
+                status = usersList.Status,
+                response = usersList.Response,
+                users = usersList.userList,
+                errors = usersList.errors
+            }); ;
         }
 
         [HttpPost]
         [Route("Create")]
         public async Task<IActionResult> CreateUser(UserDTO user)
         {
-            if (user == null)
-                return BadRequest();
-
+            if (user == null){
+                return NotFound();
+            }
             userService.Mode = UserService.enMode.Add;
             var result = await userService.Save(user);
 
-            if (!result)
-                return BadRequest();
-
-            return Ok(new { Message = "User created successfully" });
+            if (!result.IsSuccess){
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess,
+                    errors = result.errors
+                });
+            }
+            return Ok(new
+            {
+                status = result.Status,
+                response = result.Response,
+                isSuccess = result.IsSuccess,
+                errors = result.errors
+            });
         }
 
         [HttpPut]
@@ -86,11 +111,23 @@ namespace HSMAPI.Controllers
             userService.Mode = UserService.enMode.Update;
             var result = await userService.Save(user, ID);
 
-            if (!result)
-                return BadRequest();
+            if (!result.IsSuccess)
+                return BadRequest(new
+                {
+                    status = result.Status,
+                    response = result.Response,
+                    isSuccess = result.IsSuccess,
+                    errors = result.errors
+                });
 
 
-            return Ok(new { Message = "User updated successfully" });
+            return Ok(new
+            {
+                status = result.Status,
+                response = result.Response,
+                isSuccess = result.IsSuccess,
+                errors = result.errors
+            });
         }
 
         [HttpDelete]
@@ -102,10 +139,10 @@ namespace HSMAPI.Controllers
 
             var result = await userService.Delete(id);
 
-            if (!result)
+            if (!result.IsSuccess)
                 return BadRequest();
 
-            return Ok(new { Message = "User deleted successfully" });
+            return Ok(result.Response);
         }
     }
 }

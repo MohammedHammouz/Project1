@@ -11,13 +11,13 @@ namespace HSMDataAccess.DTOs
         public string ID { get; set; } = null!;
         public string PatientID { get; set; } = null!;
         public string DoctorID { get; set; } = null!;
-        public DateTime Date { get; set; }
-        public TimeSpan? Time { get; set; }
+        public DateOnly Date { get; set; }
+        public TimeOnly? Time { get; set; }
         public int Duration { get; set; }
         public string Status { get; set; } = null!;
         public bool? NotificationSent { get; set; }
         public AppointmentDTO(string id,string patientID,string doctorID,
-            DateTime date,TimeSpan? time,int duration,string status,bool? notificationSent)
+            DateOnly date,TimeOnly? time,int duration,string status,bool? notificationSent)
         {
             ID = id;
             PatientID = patientID;

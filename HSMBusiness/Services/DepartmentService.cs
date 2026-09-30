@@ -1,6 +1,7 @@
 ﻿using HSMBusiness.Mappers;
 using HSMBusiness.Pattern;
 using HSMDataAccess.DTOs;
+using HSMDataAccess.Entities;
 using HSMDataAccess.RepositoryServices;
 using System;
 using System.Collections.Generic;
@@ -54,12 +55,12 @@ namespace HSMBusiness.Services
                 await _department.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (CurrentDepartment == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -80,13 +81,23 @@ namespace HSMBusiness.Services
                 await _department.UpdateAsync(CurrentDepartment)
             );
         }
+        public async Task<bool> IsDepartmentExist(Doctor doctorEntity, DoctorDTO doctorDTO)
+        {
 
+            var department = await GetByID(doctorEntity.DepartmentID);
+            if (department.departmentDTO1 == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
         public async Task<(int, string?, bool)> Save(
             DepartmentDTO departmentDTO,
             string ID = "")
         {
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             switch (_mode)
             {
@@ -99,7 +110,7 @@ namespace HSMBusiness.Services
                     else
                     {
                         response =
-                            await resultPattern.GiveResponse(400);
+                            await resultPattern.GiveResponse(400, new Dictionary<string, string>());
                     }
 
                     return (
@@ -114,7 +125,7 @@ namespace HSMBusiness.Services
             }
 
             response =
-                await resultPattern.GiveResponse(500);
+                await resultPattern.GiveResponse(500, new Dictionary<string, string>());
 
             return (
                 response.Status,
@@ -127,19 +138,19 @@ namespace HSMBusiness.Services
             int,
             string?,
             bool,
-            List<DepartmentDTO>
+            List<DepartmentDTO>?
         )> GetAll()
         {
             var departments =
                 await _department.GetAllAsync();
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (departments == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -164,22 +175,22 @@ namespace HSMBusiness.Services
         }
 
         public async Task<(
-            int,
-            string?,
-            bool,
-            DepartmentDTO
+            int Status,
+            string? Response,
+            bool IsSuccess,
+            DepartmentDTO departmentDTO1
         )> GetByID(string ID)
         {
             var department =
                 await _department.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (department == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -211,12 +222,12 @@ namespace HSMBusiness.Services
                 await _department.GetByIDAsync(ID);
 
             var response =
-                await resultPattern.GiveResponse(200);
+                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (department == null)
             {
                 response =
-                    await resultPattern.GiveResponse(404);
+                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -231,7 +242,7 @@ namespace HSMBusiness.Services
             if (!IsDeleted)
             {
                 response =
-                    await resultPattern.GiveResponse(400);
+                    await resultPattern.GiveResponse(400, new Dictionary<string, string>());
 
                 return (
                     response.Status,

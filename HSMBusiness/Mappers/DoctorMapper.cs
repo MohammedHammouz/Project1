@@ -26,15 +26,17 @@ namespace HSMBusiness.dto
         }
         public Doctor ToEntity(DoctorDTO doctorDTO,enMode mode=enMode.Add,Doctor doctor=null)
         {
-            if (mode == enMode.Add)
-                return new Doctor
+            if (mode == enMode.Add){
+                doctor= new Doctor
                 {
-                    ID = doctorDTO.ID,
+                   
                     DepartmentID = doctorDTO.DepartmentID,
                     Specialization = doctorDTO.Specialization,
                     Status = doctorDTO.Status,
                     UserID = doctorDTO.UserID
                 };
+                return doctor;
+            }
             else
             {
                 doctor.DepartmentID = doctorDTO.DepartmentID;

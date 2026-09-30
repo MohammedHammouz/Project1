@@ -27,13 +27,13 @@ namespace HSMBusiness.Services
             this.Mode = Mode;
         }
        
-        public async  Task<(int,string?,bool,List<PersonDTO>)> GetAll()
+        public async  Task<(int Status,string? Response,bool,List<PersonDTO>? peopleList)> GetAll()
         {
             var people = await _personRepository.GetAllAsync();
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (people == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response,response.IsSuccess,null);
             }
             return (response.Status, response.Response,response.IsSuccess,people.Select(p =>new PersonMapper().ToDTO(p))
@@ -52,47 +52,56 @@ namespace HSMBusiness.Services
         {
             Person personEntity =
         await _personRepository.GetByIDAsync(ID);
-            var response =await resultPattern.GiveResponse(200);
+            var response =await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (personEntity == null)
             {
-                response =await resultPattern.GiveResponse(404);
+                response =await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status,response.Response,response.IsSuccess);
             }
 
             personEntity = new PersonMapper().ToEntity(personDTO,PersonMapper.enMode.Update,personEntity);
             return (response.Status,response.Response, await _personRepository.UpdateAsync(personEntity));
         }
-        public async Task<(int,string?, bool)> Delete(string ID)
+        public async Task<(int Status,string? Response, bool IsSuccess)> Delete(string ID)
         {
             Person person =await _personRepository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (person == null)
             {
-                response = await resultPattern.GiveResponse(200);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status,response.Response, response.IsSuccess);
             }
             bool IsDeleted = await _personRepository.DeleteAsync(person);
             if (!IsDeleted)
             {
-                response = await resultPattern.GiveResponse(500);
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status,response.Response, response.IsSuccess);
             }
             return (response.Status,response.Response, response.IsSuccess);
         }
-        public async Task<(int,bool,string?,PersonDTO)>GetByID(string ID)
+        public async Task<(int Status,bool IsSuccess,string? Response,PersonDTO? personDTO1)>GetByID(string ID)
         {
             Person person =await _personRepository.GetByIDAsync(ID);
-            var response = await resultPattern.GiveResponse(200);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             if (person == null)
             {
-                response = await resultPattern.GiveResponse(404);
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status,response.IsSuccess,response.Response,null);
             }
             return ((response.Status, response.IsSuccess, response.Response, new PersonDTO(ID, person.Name, person.ContactNumber, person.Email, person.Gender, person.Address, person.DateOfBirth)));
         }
-        public async Task<(int,string?, bool)> Save(string ID="",PersonDTO personDTO=null)
+        public async Task<bool>IsPersonExist(string ID)
         {
-            var response = await resultPattern.GiveResponse(200);
+            var person = await GetByID(ID);
+            if (person.personDTO1 == null)
+            {
+                return false;
+            }
+            return true;
+        }
+        public async Task<(int Status,string?Response, bool IsSuccess)> Save(string ID="",PersonDTO personDTO=null)
+        {
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             switch (Mode)
             {
                 case enMode.Add:
@@ -103,13 +112,13 @@ namespace HSMBusiness.Services
                     }
                     else
                     {
-                        response = await resultPattern.GiveResponse(500);
+                        response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                         return (response.Status,response.Response, response.IsSuccess);
                     }
                 case enMode.Update:
                     return await _Update(ID,personDTO);
             }
-            response = await resultPattern.GiveResponse(500);
+            response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
             return (response.Status, response.Response, response.IsSuccess);
         }
     }

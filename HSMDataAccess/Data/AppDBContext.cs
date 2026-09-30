@@ -95,12 +95,12 @@ namespace HSMDataAccess.Data
                 .HasColumnType("bit")
                 .IsRequired();
                 entity.HasOne(d => d.Department)
-                .WithOne()
+                .WithOne(d=>d.Doctor)
                  .HasForeignKey<Doctor>(d => d.DepartmentID)
                  .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(d => d.User)
-                .WithOne()
-                 .HasForeignKey<Doctor>(d => d.UserID);
+                .WithOne(u => u.doctor)
+    .HasForeignKey<Doctor>(d => d.UserID);
             });
             modelBuilder.Entity<Department>(entity =>
             {
@@ -143,8 +143,7 @@ namespace HSMDataAccess.Data
                 entity.Property(e => e.ID)
                  .HasColumnType("nchar(10)")
                 .HasMaxLength(10)
-                .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')")
-                .ValueGeneratedOnAdd();
+                .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')");
                 entity.Property(e => e.Name)
                 .HasColumnType("nvarchar(200)")
                 .HasMaxLength(200);
@@ -174,7 +173,9 @@ namespace HSMDataAccess.Data
                    });
 
                 entity.Property(e => e.ID)
-                .ValueGeneratedOnAdd();
+                  .HasColumnType("nchar(10)")
+                 .HasMaxLength(10)
+                 .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')");
                 entity.Property(e => e.ID)
                 .HasColumnType("nchar(10)")
                 .HasMaxLength(10);
@@ -194,7 +195,9 @@ namespace HSMDataAccess.Data
             {
                 entity.HasKey(e => e.ID);
                 entity.Property(e => e.ID)
-                .ValueGeneratedOnAdd();
+                  .HasColumnType("nchar(10)")
+                 .HasMaxLength(10)
+                 .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')");
                 entity.Property(e => e.Salary)
                 .HasColumnType("decimal(10, 2)")
                 .IsRequired();
@@ -212,6 +215,8 @@ namespace HSMDataAccess.Data
                   .HasForeignKey<Employee>(d => d.PersonID)
                   .OnDelete(DeleteBehavior.Restrict)
                   .HasConstraintName("FK_Employees_People");
+                entity.HasIndex(e => e.PersonID).IsUnique()
+                .HasDatabaseName("IX_Employees_Person");
             });
             modelBuilder.Entity<Notifiction>(entity =>
             {
@@ -348,7 +353,7 @@ namespace HSMDataAccess.Data
 
                 entity.Property(e => e.ID)
                     .HasColumnType("nchar(10)")
-                    .IsRequired();
+                    .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
                 entity.Property(e => e.PatientID)
                     .HasColumnType("nchar(10)")
@@ -382,6 +387,8 @@ namespace HSMDataAccess.Data
                      .HasCheckConstraint
                      ("CK_Appointments_Status", "([Status]='Cancelled' OR [Status]='Rescheduled' OR [Status]='Scheduled')");
                  });
+                entity.HasIndex(e => e.DoctorID, "IX_Appointments_Doctor");
+                entity.HasIndex(e => e.PatientID, "IX_Appointments_Patient");
                 entity.HasOne(d => d.patient)
                  .WithMany(n => n.appointment)
                   .HasForeignKey(d => d.PatientID)
@@ -394,7 +401,10 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<Bill>(entity =>
             {
                 entity.HasKey(e => e.ID);
-
+                entity.Property(e => e.ID)
+                .HasColumnType("nchar(10)")
+               .HasMaxLength(10)
+               .HasDefaultValueSql("(N'(left(CONVERT([nvarchar](36),newid()),(10)))')");
                 entity.Property(e => e.ID)
                     .HasColumnType("nchar(10)")
                     .IsRequired();
