@@ -12,10 +12,8 @@ namespace HSMDataAccess.DTOs
         public string BillID { get; set; } = null!;
         public int? Quantity { get; set; }
         public decimal UnitPrice { get; set; }
-        public decimal? TotalPrice { get; set; }
-        public BillServiceDTO()
-        {
-        }
+        public decimal? TotalPrice { get; }
+        
 
         public BillServiceDTO(
             string serviceID,

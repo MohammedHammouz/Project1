@@ -35,7 +35,6 @@ namespace HSMAPI.Controllers
         [HttpGet]
         [Route("All",Name = "GetAllDoctors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllDoctors()
         {
@@ -54,7 +53,7 @@ namespace HSMAPI.Controllers
         [HttpPost]
         [Route("Create",Name = "CreateDoctor")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CreateDoctor(DoctorDTO doctor)
         {
@@ -64,7 +63,7 @@ namespace HSMAPI.Controllers
                 if (errors.Count > 0)
                 {
                     var response = await new ResultPatern().GiveResponse(400, errors);
-                    return NotFound(new
+                    return BadRequest(new
                     {
                         status = response.Status,
                         response = response.Response,
@@ -79,12 +78,11 @@ namespace HSMAPI.Controllers
 
             if (!result.IsSuccess)
             {
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
-                    isSuccess = result.IsSuccess,
-                    errors = result.errors
+                    isSuccess = result.IsSuccess
                 });
             }
             return Ok(new
@@ -101,6 +99,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateDoctor(string ID, DoctorDTO doctor)
         {
             if (string.IsNullOrEmpty(ID))
@@ -142,15 +141,14 @@ namespace HSMAPI.Controllers
                     });
                 }
             }
-            doctorService.mode = DoctorService.enMode.Add;
+            doctorService.mode = DoctorService.enMode.Update;
             var result = await doctorService.Save(doctor, ID);
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
-                    isSuccess = result.IsSuccess,
-                    errors = result.errors
+                    isSuccess = result.IsSuccess
                 });
             return Ok(CreatedAtRoute("GetDoctorByIdAsync", new { id = doctor.ID }, doctor));
         }
@@ -158,7 +156,7 @@ namespace HSMAPI.Controllers
         [HttpDelete]
         [Route("Delete/{id}", Name = "DeleteDoctor")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteDoctor(string id)
         {
@@ -168,12 +166,11 @@ namespace HSMAPI.Controllers
             var result = await doctorService.Delete(id);
 
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
-                    isSuccess = result.IsSuccess,
-                    errors = result.errors
+                    isSuccess = result.IsSuccess
                 });
 
             return Ok(new

@@ -1,5 +1,6 @@
 ﻿using HSMDataAccess.Data;
 using HSMDataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,18 @@ namespace HSMDataAccess.RepositoryServices
 {
     public class BillRepository:GenericRepository<Bill>
     {
+        
         public BillRepository(AppDBContext context) : base(context)
         {
-
+            
+        }
+        
+       
+        public async Task<bool> IsBillExistsAsync(string billID)
+        {
+            return await _context.Set<Bill>()
+                .AnyAsync(e =>
+                    e.ID == billID);
         }
     }
 }

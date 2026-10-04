@@ -38,7 +38,6 @@ namespace HSMAPI.Controllers
         [HttpGet]
         [Route("All",Name = "GetAllAppointments")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllAppointments()
         {
@@ -59,7 +58,7 @@ namespace HSMAPI.Controllers
         [Route("Create",Name ="CreateAppointment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateAppointment(AppointmentDTO appointment)
         {
             if (string.IsNullOrWhiteSpace(appointment.DoctorID) || string.IsNullOrWhiteSpace(appointment.PatientID) || string.IsNullOrWhiteSpace(appointment.Status) || appointment.Duration <= 0)
@@ -77,12 +76,11 @@ namespace HSMAPI.Controllers
 
             if (!result.IsSuccess)
             {
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
-                    isSuccess = result.IsSuccess,
-                    errors = result.errors
+                    isSuccess = result.IsSuccess
                 });
             }
             return Ok(CreatedAtRoute("GetAppointmentByIdAsync", new {id=appointment.ID}, appointment));
@@ -93,6 +91,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateAppointment(string ID, AppointmentDTO appointment)
         {
             if (string.IsNullOrEmpty(ID))
@@ -139,12 +138,11 @@ namespace HSMAPI.Controllers
             var result = await appointmentService.Save(appointment, ID);
 
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
-                    isSuccess = result.IsSuccess,
-                    errors = result.errors
+                    isSuccess = result.IsSuccess
                 });
             return Ok(new
             {
@@ -160,6 +158,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteAppointment(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -168,11 +167,11 @@ namespace HSMAPI.Controllers
             var result = await appointmentService.Delete(id);
 
             if (!result.IsSuccess)
-                return BadRequest(new {
+                return StatusCode(result.Status, new
+                {
                     status = result.Status,
                     response = result.Response,
-                    isSuccess = result.IsSuccess,
-                    errors = result.errors
+                    isSuccess = result.IsSuccess
                 });
 
             return Ok(new

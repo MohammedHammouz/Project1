@@ -7,6 +7,7 @@ using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
 using HSMDataAccess.RepositoryServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HSMBusiness.Services
 {
@@ -14,16 +15,18 @@ namespace HSMBusiness.Services
     {
         private readonly UserRepository _repository;
         private readonly UserError _userError;
+        private readonly PersonService _personService;
         ResultPatern resultPattern = new ResultPatern();
         public enum enMode { Add = 0, Update }
         public enMode Mode = enMode.Add;
 
         public UserService(UserRepository repository,
-    UserError userError, enMode Mode = enMode.Add) 
+    UserError userError,PersonService personService, enMode Mode = enMode.Add) 
         {
           
             _repository = repository;
             _userError = userError;
+            _personService = personService;
             this.Mode = Mode;
         }
         public UserRepository userRepository
@@ -36,19 +39,61 @@ namespace HSMBusiness.Services
         private async Task<bool> _AddNew(UserDTO userDTO)
         {
             var user = new UserMapper().ToEntity(userDTO);
+            if(!await _personService.IsPersonExist(userDTO.PersonID))
+            {
+                return false;
+            }
+            if(await _repository.CountNumberOfPerson(user.PersonID) == 1)
+            {
+                return false;
+            }
            var NewUser = await _repository.AddAsync(user);
 
             user.ID = NewUser.ID;
             return user.ID != "";
         }
+        public async Task<(int Status, string? Response, bool IsSuccess, Dictionary<string, string>? errors)> NumberOfPerson(string ID)
+        {
+            User user = await _repository.GetByIDAsync(ID);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
+            if (await _repository.CountNumberOfPerson(ID) == 1)
+            {
+                response =
+                await resultPattern.GiveResponse(500,null);
+                return (
+                    response.Status,
+                    response.Response,
+                    response.IsSuccess,
+                    response.Errors
+                );
+            }
+            return (
+                    response.Status,
+                    response.Response,
+                    response.IsSuccess,
+                    response.Errors
+                );
+        }
         private async Task<(int Status, string? Response, bool IsSuccess, Dictionary<string, string>? errors)> _Update(string ID,UserDTO userDTO)
         {
 
-           User user = await _repository.GetByIDAsync(ID);
-           
+            User user = await _repository.GetByIDAsync(ID);
+            
             var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
             var errors = await _userError.ValidateUser(userDTO);
-            if (errors.Count > 0)
+            
+            if (!await _personService.IsPersonExist(userDTO.PersonID))
+            {
+                response =
+                await resultPattern.GiveResponse(400, errors);
+                return (
+                    response.Status,
+                    response.Response,
+                    response.IsSuccess,
+                    response.Errors
+                );
+            }
+                if (errors.Count > 0)
             {
                 response =
                 await resultPattern.GiveResponse(400, errors);
@@ -64,8 +109,21 @@ namespace HSMBusiness.Services
                  response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess,response.Errors);
             }
-            user = new UserMapper().ToEntity(userDTO,UserMapper.enMode.Update,user);
+            
+            if (await _repository.CountNumberOfPerson(user.PersonID) > 1)
+            {
+                response =
+                await resultPattern.GiveResponse(500, errors);
+                return (
+                    response.Status,
+                    response.Response,
+                    response.IsSuccess,
+                    response.Errors
+                );
+            }
+            user = new UserMapper().ToEntity(userDTO, UserMapper.enMode.Update, user);
             await _repository.UpdateAsync(user);
+           
             return  (response.Status, response.Response, response.IsSuccess, response.Errors);
         }
 
@@ -116,8 +174,7 @@ namespace HSMBusiness.Services
                 );
             }
 
-            bool IsDeleted =
-                await _repository.DeleteAsync(report);
+            bool IsDeleted =await _repository.DeleteAsync(report);
 
             if (!IsDeleted)
             {
@@ -148,11 +205,24 @@ namespace HSMBusiness.Services
 
             return true;
         }
+        public async Task<bool> IsUserExist(string ID)
+        {
+
+            var user = await GetByID(ID);
+            if (user.userDTO == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
         public async Task<(int Status, string? Response, bool IsSuccess, Dictionary<string, string>? errors)> Save(UserDTO userDTO,string ID="")
         {
             var response =
                 await resultPattern.GiveResponse(200, new Dictionary<string, string>());
+           
             var errors =await _userError.ValidateUser(userDTO);
+           
             if (errors.Count > 0)
             {
                 response =

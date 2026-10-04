@@ -34,33 +34,30 @@ namespace HSMBusiness.Services
             _mode = mode;
         }
 
-        private async Task<bool> Add(DepartmentDTO departmentDTO)
+        private async Task<(int Status,bool IsSuccess)> Add(DepartmentDTO departmentDTO)
         {
-            var departmentEntity =
-                new DepartmentMapper().ToEntity(departmentDTO);
-
-            var AddNew =
-                await _department.AddAsync(departmentEntity);
-
+            var departmentEntity = new DepartmentMapper().ToEntity(departmentDTO);
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
+            var AddNew = await _department.AddAsync(departmentEntity);
+            int Status = 200;
             departmentEntity.ID = AddNew.ID;
-
-            return departmentEntity.ID != "";
+            if(string.IsNullOrEmpty(departmentEntity.ID))
+            {
+                Status = 400;
+                return (Status, false);
+            }
+            return (Status,true);
         }
 
-        private async Task<(int, string?, bool)> Update(
-            string ID,
-            DepartmentDTO departmentDTO)
+        private async Task<(int, string?, bool)> Update( string ID, DepartmentDTO departmentDTO)
         {
-            var CurrentDepartment =
-                await _department.GetByIDAsync(ID);
+            var CurrentDepartment = await _department.GetByIDAsync(ID);
 
-            var response =
-                await resultPattern.GiveResponse(200, new Dictionary<string, string>());
+            var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             if (CurrentDepartment == null)
             {
-                response =
-                    await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
                 return (
                     response.Status,
@@ -68,31 +65,31 @@ namespace HSMBusiness.Services
                     response.IsSuccess
                 );
             }
-
+            await _department.UpdateAsync(CurrentDepartment);
             CurrentDepartment =
                 new DepartmentMapper().ToEntity(
                     departmentDTO,
                     DepartmentMapper.enMode.Update
                 );
-
+           
             return (
                 response.Status,
                 response.Response,
-                await _department.UpdateAsync(CurrentDepartment)
+                response.IsSuccess
             );
         }
         public async Task<bool> IsDepartmentExist(Doctor doctorEntity, DoctorDTO doctorDTO)
         {
 
             var department = await GetByID(doctorEntity.DepartmentID);
-            if (department.departmentDTO1 == null)
+            if (department.departmentDTO1.Name == "")
             {
                 return false;
             }
 
             return true;
         }
-        public async Task<(int, string?, bool)> Save(
+        public async Task<(int Status, string?Response, bool IsSuccess)> Save(
             DepartmentDTO departmentDTO,
             string ID = "")
         {
@@ -102,15 +99,15 @@ namespace HSMBusiness.Services
             switch (_mode)
             {
                 case enMode.Add:
-
-                    if (await Add(departmentDTO))
+                    var NewDepartment = await Add(departmentDTO);
+                    if (NewDepartment.IsSuccess)
                     {
                         _mode = enMode.Update;
                     }
                     else
                     {
                         response =
-                            await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                            await resultPattern.GiveResponse(NewDepartment.Status, new Dictionary<string, string>());
                     }
 
                     return (
@@ -135,10 +132,10 @@ namespace HSMBusiness.Services
         }
 
         public async Task<(
-            int,
-            string?,
-            bool,
-            List<DepartmentDTO>?
+            int Status,
+            string? Response,
+            bool IsSuccess,
+            List<DepartmentDTO>? ListDepartments
         )> GetAll()
         {
             var departments =
@@ -216,7 +213,7 @@ namespace HSMBusiness.Services
             );
         }
 
-        public async Task<(int, string?, bool)> Delete(string ID)
+        public async Task<(int Status, string?Response, bool IsSuccess)> Delete(string ID)
         {
             var department =
                 await _department.GetByIDAsync(ID);

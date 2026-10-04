@@ -74,26 +74,35 @@ namespace HSMBusiness
             return (response.Status,response.Response,response.IsSuccess, doctors.Select(d => new DoctorMapper().ToDTO(d))
         .ToList());
         }
-        private async Task<bool> Add(DoctorDTO doctorDTO)
+        private async Task<(int Status,bool IsSuccess)> Add(DoctorDTO doctorDTO)
         {
             
             var doctorEntity = new DoctorMapper().ToEntity(doctorDTO);
             if (!await _departmentService.IsDepartmentExist(doctorEntity, doctorDTO)  && !await  _userService.IsUserExist(doctorEntity, doctorDTO))
             {
-                return false;
+                return (500,false);
             }
             doctorEntity.User = await _userRepository.GetByIDAsync(doctorEntity.UserID);
             if (doctorEntity.User == null)
             {
-                return false;
+                return (404, false);
             }
-            if(doctorEntity.User.Role == "Doctor")
+            if(await _doctor.CountNumberOfUserIDIsOne(doctorDTO.UserID) == 1)
             {
-                var AddNew = await _doctor.AddAsync(doctorEntity);
-                doctorEntity.ID = AddNew.ID;
+                return (500, false);
             }
-            
-            return doctorEntity.ID != "";
+            if(doctorEntity.User.Role != "Doctor")
+            {
+                return (500, false);
+            }
+
+            if(doctorEntity.ID == "")
+            {
+                return (500, false);
+            }
+            var AddNew = await _doctor.AddAsync(doctorEntity);
+            doctorEntity.ID = AddNew.ID;
+            return (200, true);
         }
         public async Task<bool> IsDoctorExist(Appointment appointmentEntity, AppointmentDTO appointmentDTO)
         {
@@ -126,11 +135,14 @@ namespace HSMBusiness
                 response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
-            if (doctorEntity.User.Role == "Doctor")
+            
+            if (doctorEntity.User.Role != "Doctor")
             {
-                var AddNew = await _doctor.AddAsync(doctorEntity);
-                doctorEntity.ID = AddNew.ID;
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
+            var AddNew = await _doctor.AddAsync(doctorEntity);
+            doctorEntity.ID = AddNew.ID;
             doctorEntity = new DoctorMapper().ToEntity(doctorDTO,DoctorMapper.enMode.Update,doctorEntity);
             await _doctor.UpdateAsync(doctorEntity);
             return (response.Status, response.Response, response.IsSuccess, response.Errors);
@@ -141,14 +153,14 @@ namespace HSMBusiness
             switch (mode)
             {
                 case enMode.Add:
-                    
-                    if (await Add(doctorDTO))
+                    var AddNew = await Add(doctorDTO);
+                    if (AddNew.IsSuccess)
                     {
                         mode = enMode.Update;
                     }
                     else
                     {
-                        response =await  resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                        response =await  resultPattern.GiveResponse(AddNew.Status, new Dictionary<string, string>());
                         
                     }
                     return (response.Status, response.Response, response.IsSuccess, response.Errors);

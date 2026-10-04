@@ -14,7 +14,7 @@ namespace HSMBusiness.Mappers
        
         public UserDTO ToDTO(User user)
         {
-            return new UserDTO(user.ID,user.Name,user.Role,user.Status,user.PasswordHash,user.EmployeeID);
+            return new UserDTO(user.ID,user.Name,user.Role,user.Status,user.PasswordHash,user.PersonID);
         }
 
         public User ToEntity(UserDTO userDTO, enMode mode = enMode.Add, User user = null)
@@ -29,7 +29,7 @@ namespace HSMBusiness.Mappers
                     Role = userDTO.Role,
                     Status = userDTO.Status,
                     PasswordHash = userDTO.PasswordHash,
-                    EmployeeID = userDTO.EmployeeID
+                    PersonID = userDTO.PersonID
                 };
             }
             else
@@ -38,7 +38,7 @@ namespace HSMBusiness.Mappers
                 user.Role = userDTO.Role;
                 user.Status = userDTO.Status;
                 user.PasswordHash = userDTO.PasswordHash;
-                user.EmployeeID = userDTO.EmployeeID;
+                user.PersonID = userDTO.PersonID;
                 return user;
             }
 

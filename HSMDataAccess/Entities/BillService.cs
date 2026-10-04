@@ -12,7 +12,7 @@ namespace HSMDataAccess.Entities
         public string BillID { get; set; } = null!;
         public int? Quantity { get; set; }
         public decimal UnitPrice { get; set; }
-        public decimal? TotalPrice { get; set; }
+        public decimal? TotalPrice { get; }
         public virtual Bill bill { get; set; } = null!;
         public virtual MedicalService medicalService { get; set; } = null!;
     }

@@ -32,17 +32,30 @@ namespace HSMBusiness.Services
             _personService = personService;
             Mode = mode;
         }
-        
-        private async Task<bool> _AddNew(EmployeeDTO employeeDTO)
+        public async Task<bool> CountNumberOfPersonIDIsOne(string PersonID)
+        {
+            int result =await _employeeRepository.CountNumberOfPersonIDIsOne(PersonID);
+            return result == 1;
+        }
+        private async Task<(int Status,bool IsSuccess)> _AddNew(EmployeeDTO employeeDTO)
         {
             var employeeEntity = new EmployeeMapper().ToEntity(employeeDTO);
-            if(!await _personService.IsPersonExist(employeeEntity.PersonID))
+            if (!await _personService.IsPersonExist(employeeEntity.PersonID))
             {
-                return false;
+                return (500, false);
             }
+            if (await CountNumberOfPersonIDIsOne(employeeDTO.PersonID))
+            {
+                return (500, false);
+            }
+            
             var AddNew = await _employeeRepository.AddAsync(employeeEntity);
             employeeEntity.ID = AddNew.ID;
-            return employeeEntity.ID != "";
+            if(employeeEntity.ID == "")
+            {
+                return (500, false);
+            }
+            return (200, false);
         }
         private async Task<(int,string?,bool)> _Update(string ID,EmployeeDTO employeeDTO)
         {
@@ -52,8 +65,15 @@ namespace HSMBusiness.Services
                 response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
+            if (!await _personService.IsPersonExist(employee.PersonID))
+            {
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess);
+            }
+            
             employee = new EmployeeMapper().ToEntity(employeeDTO,EmployeeMapper.enMode.Update,employee);
             await _employeeRepository.UpdateAsync(employee);
+            
             return (response.Status, response.Response, response.IsSuccess);
         }
         public async Task<(int Status,string? Response,bool IsSuccess)> Delete(string ID)
@@ -109,7 +129,8 @@ namespace HSMBusiness.Services
                 case enMode.Update:
                     return await _Update(ID,employeeDTO);
                 case enMode.Add:
-                    if (await _AddNew(employeeDTO))
+                    var AddNew = await _AddNew(employeeDTO);
+                    if (AddNew.IsSuccess)
                     {
 
                         Mode = enMode.Update;
@@ -117,7 +138,7 @@ namespace HSMBusiness.Services
                     }
 
                     else{
-                        response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                        response = await resultPattern.GiveResponse(AddNew.Status, new Dictionary<string, string>());
                         return (response.Status, response.Response, response.IsSuccess);
                     }
             }

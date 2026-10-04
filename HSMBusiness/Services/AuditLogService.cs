@@ -19,35 +19,49 @@ namespace HSMBusiness.Services
         public enMode _mode = enMode.Add;
 
         private readonly AuditLogRepository _auditLog;
-
+        private readonly UserService _userService;
         public AuditLogRepository auditLogRepository
         {
             get { return _auditLog; }
         }
 
-        public AuditLogService(AuditLogRepository auditLog, enMode mode = enMode.Add)
+        public AuditLogService(AuditLogRepository auditLog,UserService userService, enMode mode = enMode.Add)
         {
             _auditLog = auditLog;
+            _userService = userService;
             _mode = mode;
         }
 
-        private async Task<bool> Add(AuditLogDTO auditLogDTO)
+        private async Task<(int Status,bool IsSuccess)> Add(AuditLogDTO auditLogDTO ,int Status)
         {
             var auditLogEntity = new AuditLogMapper().ToEntity(auditLogDTO);
-
+            if(!await _userService.IsUserExist(auditLogEntity.UserID))
+            {
+                Status = 404;
+                return (Status,false);
+            }
+            if(auditLogDTO.Action!= "Delete" || auditLogDTO.Action != "Access" || auditLogDTO.Action != "Create" || auditLogDTO.Action != "Update" ){
+                Status = 500;
+                return (Status,false);
+            }
             var AddNew = await _auditLog.AddAsync(auditLogEntity);
 
             auditLogEntity.ID = AddNew.ID;
-
-            return auditLogEntity.ID != "";
+            
+            return (Status,auditLogEntity.ID != "");
         }
 
         private async Task<(int, string?, bool)> Update(string ID,AuditLogDTO auditLogDTO)
         {
             var CurrentAuditLog = await _auditLog.GetByIDAsync(ID);
-
+            
             var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
+            if (!await _userService.IsUserExist(CurrentAuditLog.UserID))
+            {
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
 
+                return (response.Status, response.Response, response.IsSuccess);
+            }
             if (CurrentAuditLog == null)
             {
                 response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
@@ -60,22 +74,22 @@ namespace HSMBusiness.Services
             return ( response.Status, response.Response, await _auditLog.UpdateAsync(CurrentAuditLog));
         }
 
-        public async Task<(int, string?, bool)> Save(AuditLogDTO auditLogDTO,string ID = "")
+        public async Task<(int Status, string?Response, bool IsSuccess)> Save(AuditLogDTO auditLogDTO,string ID = "")
         {
             var response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
 
             switch (_mode)
             {
                 case enMode.Add:
-
-                    if (await Add(auditLogDTO))
+                    var addNew = await Add(auditLogDTO, response.Status);
+                    if (addNew.IsSuccess)
                     {
                         _mode = enMode.Update;
                     }
                     else
                     {
                         response =
-                            await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                            await resultPattern.GiveResponse(addNew.Status, new Dictionary<string, string>());
                     }
 
                     return ( response.Status,response.Response,response.IsSuccess);
@@ -90,7 +104,7 @@ namespace HSMBusiness.Services
             return ( response.Status, response.Response,  response.IsSuccess);
         }
 
-        public async Task<(int,string?,bool,List<AuditLogDTO>)> GetAll()
+        public async Task<(int Status,string? Response,bool IsSuccess,List<AuditLogDTO>listOfAuditLogs)> GetAll()
         {
             var auditLogs = await _auditLog.GetAllAsync();
 
@@ -107,7 +121,7 @@ namespace HSMBusiness.Services
                     new AuditLogDTO( a.ID,a.UserID,a.Entity,a.Action,a.Timestamp,a.Details)).ToList());
         }
 
-        public async Task<(int,string?,bool, AuditLogDTO)> GetByID(string ID)
+        public async Task<(int Status,string? Response,bool IsSuccess, AuditLogDTO auditLogDTO1)> GetByID(string ID)
         {
             var auditLog = await _auditLog.GetByIDAsync(ID);
 
@@ -123,7 +137,7 @@ namespace HSMBusiness.Services
             return (response.Status,response.Response,response.IsSuccess,new AuditLogDTO(auditLog.ID,auditLog.UserID,auditLog.Entity,auditLog.Action,auditLog.Timestamp,auditLog.Details));
         }
 
-        public async Task<(int, string?, bool)> Delete(
+        public async Task<(int Status, string?Response, bool IsSuccess)> Delete(
             string ID)
         {
             var auditLog =await _auditLog.GetByIDAsync(ID);

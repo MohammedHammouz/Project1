@@ -15,6 +15,7 @@ namespace HSMBusiness.Services
     {
         private readonly BillRepository _repository;
         private readonly PersonService _personService;
+        private readonly BillServiceService _billServiceService;
         private readonly PatientService _patientService;
         public enum enMode { Add = 0, Update }
         public enMode Mode = enMode.Add;
@@ -26,11 +27,20 @@ namespace HSMBusiness.Services
                 return _repository;
             }
         }
-        public BillService(BillRepository repository,PersonService personService,PatientService patientService,enMode mode = enMode.Add)
+        private async Task<bool> IsBillAtLeastOn(string BillID)
+        {
+            if(await _billServiceService.IsBillExist(BillID))
+            {
+                return true; 
+            }
+            return false;
+        }
+        public BillService(BillRepository repository,PersonService personService,PatientService patientService,BillServiceService billServiceService,enMode mode = enMode.Add)
         {
             _repository = repository;
             _personService = personService;
             _patientService = patientService;
+            _billServiceService = billServiceService;
             Mode = mode;
         }
         public async Task<(int Status,string? Response, bool IsSuccess, List<BillDTO>? billsList)> GetAll()
@@ -55,16 +65,23 @@ namespace HSMBusiness.Services
             }
             return (response.Status, response.Response, response.IsSuccess, new BillMapper().ToDTO(bill));
         }
-        private async Task<bool>_Add(BillDTO billDTO)
+        private async Task<(int Status,bool IsSuccess)>_Add(BillDTO billDTO)
         {
             var bill = new BillMapper().ToEntity(billDTO);
+            int Status = 200;
             if(!await _patientService.IsPatientExist(bill.ID))
             {
-                return false;
+                Status = 500;
+                return (Status,false);
             }
             var AddNew = await _repository.AddAsync(bill);
             bill.ID = AddNew.ID;
-            return bill.ID != "";
+            if (string.IsNullOrEmpty(bill.ID))
+            {
+                Status = 500;
+                return (Status, false);
+            }
+            return (Status,true);
         }
         private async Task<(int,string?,bool)>_Update(BillDTO billDTO,string ID)
         {
@@ -73,6 +90,11 @@ namespace HSMBusiness.Services
             if (!await _patientService.IsPatientExist(ID))
             {
                 response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess);
+            }
+            if(bill.Status!= "Cancelled" || bill.Status!= "Partially Paid" || bill.Status!= "Unpaid" || bill.Status != "Paid")
+            {
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
             if (bill == null)
@@ -93,6 +115,11 @@ namespace HSMBusiness.Services
                 response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess);
             }
+            if(await IsBillAtLeastOn(ID))
+            {
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess);
+            }
             bool IsDeleted = await _repository.DeleteAsync(bill);
             if (!IsDeleted)
             {
@@ -107,13 +134,14 @@ namespace HSMBusiness.Services
             switch (Mode)
             {
                 case enMode.Add:
-                    if(await _Add(billDTO))
+                    var NewBill = await _Add(billDTO);
+                    if (NewBill.IsSuccess)
                     {
                             Mode = enMode.Update;
                     }
                     else
                     {
-                        response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                        response = await resultPattern.GiveResponse(NewBill.Status, new Dictionary<string, string>());
                     }
                     return (response.Status, response.Response, response.IsSuccess);
                 case enMode.Update:

@@ -21,7 +21,7 @@ namespace HSMBusiness.Mappers
                 {
                     return new Department
                     {
-                        ID = departmentDTO.ID,
+                       
                         Name = departmentDTO.Name,
                         HeadOf = departmentDTO.HeadOf
                     };
@@ -30,7 +30,7 @@ namespace HSMBusiness.Mappers
                 {
                     return new Department
                     {
-                        ID = departmentDTO.ID,
+                        
                         Name = departmentDTO.Name,
                         HeadOf = departmentDTO.HeadOf
                     };

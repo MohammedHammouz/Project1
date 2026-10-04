@@ -1,4 +1,5 @@
 ﻿using HSMBusiness.dto;
+using HSMBusiness.Mappers;
 using HSMBusiness.Pattern;
 using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
@@ -40,27 +41,54 @@ namespace HSMBusiness.Services
         .ToList());
         }
         
-
-        private async Task<bool> _Add(PersonDTO personDTO)
+        public async Task<bool> CountNumberOfContactNumberIsOne(string ContactNumber)
         {
+            int result = await _personRepository.CountNumberOfContactNumberIsOne(ContactNumber);
+            return result == 1;
+        }
+        public async Task<bool> CountNumberOfEmailIsOne(string Email)
+        {
+            int result = await _personRepository.CountNumberOfEmailIsOne(Email);
+            return result == 1;
+        }
+        private async Task<(int Status,bool IsSuccess)> _Add(PersonDTO personDTO)
+        {
+            int Status = 200;
             var personEntity = new PersonMapper().ToEntity(personDTO);
+            if(await CountNumberOfContactNumberIsOne(personEntity.ContactNumber) && await CountNumberOfEmailIsOne(personEntity.Email))
+            {
+                Status = 500;
+                return (Status, false);
+            }
             var person = await _personRepository.AddAsync(personEntity);
             personEntity.ID =person.ID;
-            return personEntity.ID != "";
+            if (personEntity.ID == "")
+            {
+                Status = 500;
+                return (Status, false);
+            }
+            return (Status, false);
         }
-        private async Task<(int,string?,bool)> _Update(string ID,PersonDTO personDTO)
+        private async Task<(int Status,string?Response,bool IsSuccess)> _Update(string ID,PersonDTO personDTO)
         {
-            Person personEntity =
-        await _personRepository.GetByIDAsync(ID);
+            Person personEntity = await _personRepository.GetByIDAsync(ID);
             var response =await resultPattern.GiveResponse(200, new Dictionary<string, string>());
-            if (personEntity == null)
+            
+                if (personEntity == null)
             {
                 response =await resultPattern.GiveResponse(404, new Dictionary<string, string>());
                 return (response.Status,response.Response,response.IsSuccess);
             }
-
+            personEntity = new PersonMapper().ToEntity(personDTO, PersonMapper.enMode.Update,personEntity);
+            await _personRepository.UpdateAsync(personEntity);
+            if (!await CountNumberOfContactNumberIsOne(personEntity.ContactNumber) && !await CountNumberOfEmailIsOne(personEntity.Email))
+            {
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess);
+            }
             personEntity = new PersonMapper().ToEntity(personDTO,PersonMapper.enMode.Update,personEntity);
-            return (response.Status,response.Response, await _personRepository.UpdateAsync(personEntity));
+            
+            return (response.Status,response.Response, response.IsSuccess);
         }
         public async Task<(int Status,string? Response, bool IsSuccess)> Delete(string ID)
         {
@@ -105,14 +133,15 @@ namespace HSMBusiness.Services
             switch (Mode)
             {
                 case enMode.Add:
-                    if(await _Add(personDTO))
+                    var AddNewPerson = await _Add(personDTO);
+                    if (AddNewPerson.IsSuccess)
                     {
                         Mode = enMode.Update;
                         return (response.Status,response.Response,response.IsSuccess);
                     }
                     else
                     {
-                        response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                        response = await resultPattern.GiveResponse(AddNewPerson.Status, new Dictionary<string, string>());
                         return (response.Status,response.Response, response.IsSuccess);
                     }
                 case enMode.Update:

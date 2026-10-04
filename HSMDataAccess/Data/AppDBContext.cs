@@ -37,6 +37,9 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.ID);
+                entity.Property(e => e.ID)
+                   .HasColumnType("nchar(10)")
+                   .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
 
                 entity.ToTable(e =>
@@ -61,13 +64,14 @@ namespace HSMDataAccess.Data
                 .HasColumnType("nvarchar(255)")
                 .HasMaxLength(255)
                 .IsRequired();
-                entity.Property(e => e.EmployeeID)
+                entity.Property(e => e.PersonID)
                 .HasColumnType("nchar(10)")
                 .HasMaxLength(10)
                 .IsRequired();
-                entity.HasOne(u => u.Employee)
+                entity.HasOne(u => u.Person)
                   .WithOne()
-                  .HasForeignKey<User>(e => e.EmployeeID);
+                  .HasForeignKey<User>(e => e.PersonID);
+                entity.HasIndex(e => e.PersonID, "IX_Users_Person");
             });
             modelBuilder.Entity<Doctor>(entity =>
             {
@@ -107,8 +111,7 @@ namespace HSMDataAccess.Data
                 entity.Property(e => e.ID)
                  .HasColumnType("nchar(10)")
                 .HasMaxLength(10)
-                .HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)")
-                .ValueGeneratedOnAdd();
+                .HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)");
                 entity.Property(e => e.Name)
                  .HasColumnType("nchar(10)")
                 .HasMaxLength(10);
@@ -140,6 +143,8 @@ namespace HSMDataAccess.Data
                       .HasCheckConstraint
                       ("CK_People_Name", "(len(Trim([Name]))>=(2))");
                   });
+                entity.HasIndex(e => e.Email, "IX_People_Email").IsUnique();
+                entity.HasIndex(e => e.ContactNumber, "IX_People_ContactNumber").IsUnique();
                 entity.Property(e => e.ID)
                  .HasColumnType("nchar(10)")
                 .HasMaxLength(10)
@@ -221,6 +226,9 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<Notifiction>(entity =>
             {
                 entity.HasKey(e => e.ID);
+                entity.Property(e => e.ID)
+                   .HasColumnType("nchar(10)")
+                   .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
                 entity.Property(e => e.ID)
                     .HasColumnType("nchar(10)")
@@ -283,6 +291,9 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<Report>(entity =>
             {
                 entity.HasKey(e => e.ID);
+                entity.Property(e => e.ID)
+                   .HasColumnType("nchar(10)")
+                   .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
                 entity.Property(e => e.ID)
                     .HasColumnType("nchar(10)")
@@ -467,6 +478,9 @@ namespace HSMDataAccess.Data
                 entity.ToTable("AuditLogs");
 
                 entity.HasKey(x => x.ID);
+                entity.Property(e => e.ID)
+                   .HasColumnType("nchar(10)")
+                   .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
                 entity.Property(x => x.ID)
                     .HasColumnType("nchar(10)")
@@ -505,6 +519,9 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<ServiceCategory>(entity =>
             {
                 entity.ToTable("ServiceCategories");
+                entity.Property(e => e.ID)
+                   .HasColumnType("nchar(10)")
+                   .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
                 entity.HasKey(x => x.ID);
 
@@ -527,6 +544,9 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<MedicalService>(entity =>
             {
                 entity.HasKey(x => x.ID);
+                entity.Property(e => e.ID)
+                   .HasColumnType("nchar(10)")
+                   .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
                 entity.Property(x => x.ID)
                     .HasColumnType("nchar(10)")
@@ -559,6 +579,9 @@ namespace HSMDataAccess.Data
             modelBuilder.Entity<MedicalRecord>(entity =>
             {
                 entity.HasKey(x => x.ID);
+                entity.Property(e => e.ID)
+                   .HasColumnType("nchar(10)")
+                   .IsRequired().HasDefaultValueSql("LEFT(CONVERT(nvarchar(36), NEWID()), 10)"); ;
 
                 entity.Property(x => x.ID)
                     .HasColumnType("nchar(10)")
@@ -611,6 +634,7 @@ namespace HSMDataAccess.Data
                     x.BillID,
                     x.ServiceID
                 });
+               
 
                 entity.Property(x => x.BillID)
                     .HasColumnType("nchar(10)")
@@ -627,8 +651,7 @@ namespace HSMDataAccess.Data
                     .HasColumnType("decimal(10,2)")
                     .IsRequired();
 
-                entity.Property(x => x.TotalPrice)
-                    .IsRequired(false);
+                entity.Property(x => x.TotalPrice).HasComputedColumnSql("[Quantity] * [UnitPrice]");
 
                 entity.HasOne(x => x.bill)
                     .WithMany(x => x.billService)
@@ -640,6 +663,7 @@ namespace HSMDataAccess.Data
                     .HasForeignKey(x => x.ServiceID)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
         }
     }
 }

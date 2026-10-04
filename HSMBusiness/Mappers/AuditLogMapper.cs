@@ -18,7 +18,7 @@ namespace HSMBusiness.Mappers
             {
                 return new AuditLog
                 {
-                    ID = auditLogDTO.ID,
+                    
                     UserID = auditLogDTO.UserID,
                     Entity = auditLogDTO.Entity,
                     Action = auditLogDTO.Action,

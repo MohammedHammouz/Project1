@@ -21,13 +21,13 @@ namespace HSMAPI.Controllers
         public async Task<IActionResult> GetPersonByIdAsync(string Id)
         {
             var person = await personService.GetByID(Id);
-            if (Id == "")
+            if (string.IsNullOrEmpty(Id))
             {
                 return BadRequest($"{person.Status},{person.Response}");
             }
             if (person.personDTO1 == null)
             {
-                return NotFound($"{person.Response},{person.Response}");
+                return NotFound($"{person.Status},{person.Response}");
             }
 
             return Ok(new { response = person.Response, IsSuccess = person.IsSuccess, employeeDTO = person.personDTO1 });
@@ -35,7 +35,7 @@ namespace HSMAPI.Controllers
         [HttpGet]
         [Route("All", Name = "GetAllPeople")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllPeople()
         {
@@ -57,6 +57,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreatePerson(PersonDTO people)
         {
             var response = await new ResultPatern().GiveResponse(200, null);
@@ -91,12 +92,15 @@ namespace HSMAPI.Controllers
 
             if (!result.IsSuccess)
             {
-                return BadRequest(new
-                {
-                    status = result.Status,
-                    response = result.Response,
-                    isSuccess = result.IsSuccess
-                });
+                
+                    return StatusCode(result.Status, new
+                    {
+                        status = result.Status,
+                        response = result.Response,
+                        isSuccess = result.IsSuccess
+                    });
+                
+                
             }
             return Ok(CreatedAtRoute("GetPersonByIdAsync", new { id = people.ID }, people));
 
@@ -138,17 +142,20 @@ namespace HSMAPI.Controllers
             }
            
 
-           personService.Mode = PersonService.enMode.Add;
+           personService.Mode = PersonService.enMode.Update;
             var result = await personService.Save(ID,people);
 
-            if (!result.IsSuccess)
-                return BadRequest(new
-                {
-                    status = result.Status,
-                    response = result.Response,
-                    isSuccess = result.IsSuccess
-
-                });
+            if (!result.IsSuccess){
+                
+                    return StatusCode(result.Status, new
+                    {
+                        status = result.Status,
+                        response = result.Response,
+                        isSuccess = result.IsSuccess
+                    });
+                
+                
+            }
             return Ok(new
             {
                 status = result.Status,
@@ -162,6 +169,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeletePerson(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -170,7 +178,7 @@ namespace HSMAPI.Controllers
             var result = await personService.Delete(id);
 
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,

@@ -63,7 +63,8 @@ namespace HSMAPI
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<UserError>();
             builder.Services.AddScoped<UserService>();
-           
+            builder.Services.AddScoped<BillServiceRepository>();
+            builder.Services.AddScoped<BillServiceService>();
             var app = builder.Build();  
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

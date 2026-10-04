@@ -80,9 +80,20 @@ namespace HSMAPI.Controllers
             if (user == null){
                 return NotFound();
             }
+            var NumOfUser = await userService.NumberOfPerson(user.PersonID);
+            if (!NumOfUser.IsSuccess)
+            {
+                return StatusCode(500, new
+                {
+                    status = NumOfUser.Status,
+                    response = NumOfUser.Response,
+                    isSuccess = NumOfUser.IsSuccess,
+                    errors = NumOfUser.errors
+                });
+            }
             userService.Mode = UserService.enMode.Add;
             var result = await userService.Save(user);
-
+           
             if (!result.IsSuccess){
                 return BadRequest(new
                 {
@@ -92,6 +103,7 @@ namespace HSMAPI.Controllers
                     errors = result.errors
                 });
             }
+           
             return Ok(new
             {
                 status = result.Status,
@@ -107,7 +119,17 @@ namespace HSMAPI.Controllers
         {
             if (user == null || ID is null || ID is "")
                 return BadRequest();
-
+            var NumOfUser = await userService.NumberOfPerson(user.PersonID);
+            //if (!NumOfUser.IsSuccess)
+            //{
+            //    return StatusCode(500, new
+            //    {
+            //        status = NumOfUser.Status,
+            //        response = NumOfUser.Response,
+            //        isSuccess = NumOfUser.IsSuccess,
+            //        errors = NumOfUser.errors
+            //    });
+            //}
             userService.Mode = UserService.enMode.Update;
             var result = await userService.Save(user, ID);
 

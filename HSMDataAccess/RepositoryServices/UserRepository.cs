@@ -19,6 +19,10 @@ namespace HSMDataAccess.RepositoryServices
         {
 
         }
-
+        public async Task<int>CountNumberOfPerson(string PersonID)
+        {
+            var count = _context.Users.CountAsync(u => u.PersonID == PersonID);
+            return await count;
+        }
     }
 }

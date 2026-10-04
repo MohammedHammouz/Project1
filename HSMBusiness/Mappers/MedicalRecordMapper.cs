@@ -20,7 +20,7 @@ namespace HSMBusiness.Mappers
             {
                 return new MedicalRecord
                 {
-                    ID = medicalRecordDTO.ID,
+                   
                     PatientID = medicalRecordDTO.PatientID,
                     Diagnosis = medicalRecordDTO.Diagnosis,
                     Treatment = medicalRecordDTO.Treatment,
@@ -34,7 +34,7 @@ namespace HSMBusiness.Mappers
             {
                 return new MedicalRecord
                 {
-                    ID = medicalRecordDTO.ID,
+                    
                     PatientID = medicalRecordDTO.PatientID,
                     Diagnosis = medicalRecordDTO.Diagnosis,
                     Treatment = medicalRecordDTO.Treatment,

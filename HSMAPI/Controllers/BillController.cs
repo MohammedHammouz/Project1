@@ -53,7 +53,7 @@ namespace HSMAPI.Controllers
         [Route("Create", Name = "CreateBill")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateBill(BillDTO bill)
         {
             var response = await new ResultPatern().GiveResponse(200, null);
@@ -88,7 +88,7 @@ namespace HSMAPI.Controllers
 
             if (!result.IsSuccess)
             {
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
@@ -103,6 +103,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateBill(string ID, BillDTO bill)
         {
 
@@ -139,12 +140,11 @@ namespace HSMAPI.Controllers
             var result = await billService.Save(bill,ID);
 
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
                     isSuccess = result.IsSuccess
-
                 });
             return Ok(new
             {
@@ -159,6 +159,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteBill(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -167,7 +168,7 @@ namespace HSMAPI.Controllers
             var result = await billService.Delete(id);
 
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,

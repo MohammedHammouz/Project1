@@ -32,32 +32,36 @@ namespace HSMBusiness.Services
             this.doctorService = doctorService;
             _mode = mode;
         }
-        private async Task<bool> Add(AppointmentDTO appointmentDTO)
+        private async Task<(int Status,bool IsSuccess)> Add(AppointmentDTO appointmentDTO)
         {
             var appointmentEntity = await new AppointmentMapper().ToEntity(appointmentDTO);
             if (appointmentEntity == null)
             {
-                return false;
+                return (404,false);
             }
             if (!await doctorService.IsDoctorExist(appointmentEntity, appointmentDTO) && !await patientService.IsPatientExist(appointmentEntity, appointmentDTO))
             {
-                return false;
+                return (500,false);
             }
             if(await appointmentRepository.DoctorHasAppointment(appointmentEntity.DoctorID,appointmentEntity.Date,appointmentEntity.Time))
             {
-                return false;
+                return (500, false);
             }
             if (await appointmentRepository.PatientHasAppointment(appointmentEntity.PatientID, appointmentEntity.Date, appointmentEntity.Time))
             {
-                return false;
+                return (500, false);
             }
             if (appointmentEntity.Status != "Scheduled")
             {
-                return false;
+                return (500, false);
             }
             var AddNew = await _appointment.AddAsync(appointmentEntity);
             appointmentEntity.ID = AddNew.ID;
-            return appointmentEntity.ID != "";
+            if(appointmentEntity.ID == "")
+            {
+                return (500, false);
+            }
+            return  (200, false);
         }
         
        
@@ -79,12 +83,12 @@ namespace HSMBusiness.Services
             }
             if (await appointmentRepository.DoctorHasAppointment(CurrentAppointment.DoctorID, CurrentAppointment.Date, CurrentAppointment.Time))
             {
-                response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
             if (await appointmentRepository.PatientHasAppointment(CurrentAppointment.PatientID, CurrentAppointment.Date, CurrentAppointment.Time))
             {
-                response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
             var errors = await appointmentError.ValidateAppointment(appointmentDTO);
@@ -92,7 +96,7 @@ namespace HSMBusiness.Services
             if (errors.Count > 0)
             {
                 response =
-                await resultPattern.GiveResponse(400, errors);
+                await resultPattern.GiveResponse(500, errors);
                 return (
                     response.Status,
                     response.Response,
@@ -102,7 +106,7 @@ namespace HSMBusiness.Services
             }
             if (CurrentAppointment.Status == "Cancelled")
             {
-                response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
             CurrentAppointment = await new AppointmentMapper().ToEntity(appointmentDTO,AppointmentMapper.enMode.Update,CurrentAppointment);
@@ -110,7 +114,7 @@ namespace HSMBusiness.Services
             await _appointment.UpdateAsync(CurrentAppointment);
             if (CurrentAppointment.Status == "Scheduled")
             {
-                response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
             return (response.Status, response.Response, response.IsSuccess, response.Errors);
@@ -134,14 +138,15 @@ namespace HSMBusiness.Services
             switch (_mode)
             {
                  case enMode.Add:
-                    if(await Add(appointmentDTO))
+                    var AddNew = await Add(appointmentDTO);
+                    if (AddNew.IsSuccess)
                     {
                         _mode = enMode.Update;
                         
                     }
                     else
                     {
-                        response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                        response = await resultPattern.GiveResponse(AddNew.Status, new Dictionary<string, string>());
                     }
                     return (response.Status, response.Response, response.IsSuccess, response.Errors);
                  case enMode.Update:
@@ -186,7 +191,7 @@ namespace HSMBusiness.Services
             bool IsDeleted = await _appointment.DeleteAsync(appointment);
             if (!IsDeleted)
             {
-                response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
             return (response.Status, response.Response, response.IsSuccess, response.Errors);

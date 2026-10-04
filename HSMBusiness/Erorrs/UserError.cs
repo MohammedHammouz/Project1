@@ -10,12 +10,12 @@ namespace HSMBusiness.Erorrs
 {
     public class UserError
     {
-        private readonly EmployeeService? _employeeService;
-        
-        //public UserError(EmployeeService employeeService)
-        //{
-        //    _employeeService = employeeService;
-        //}
+        private readonly PersonService? _personService;
+
+        public UserError(PersonService personService)
+        {
+            _personService = personService;
+        }
         public async Task<Dictionary<string, string>> ValidateUser(UserDTO dto) { 
             var errors = new Dictionary<string, string>(); 
             if (string.IsNullOrWhiteSpace(dto.UserID)) { 
@@ -46,17 +46,17 @@ namespace HSMBusiness.Erorrs
             if (string.IsNullOrWhiteSpace(dto.PasswordHash)) { 
                 errors["PasswordHash"] = "PasswordHash is required."; 
             } 
-            if (string.IsNullOrWhiteSpace(dto.EmployeeID) ) { 
-                errors["EmployeeID"] = "EmployeeID is required."; 
+            if (string.IsNullOrWhiteSpace(dto.PersonID) ) { 
+                errors["PersonID"] = "PersonID is required."; 
             }
             else
             {
                
-                var employee = await _employeeService.GetByID(dto.EmployeeID);
+                var person = await _personService.GetByID(dto.PersonID);
 
-                if (employee.Item3 == null)
+                if (person.Item3 == null)
                 {
-                    errors["EmployeeID"] = "Employee does not exist.";
+                    errors["PersonID"] = "Person does not exist.";
                 }
             }
             return errors; }

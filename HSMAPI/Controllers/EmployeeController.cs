@@ -26,7 +26,7 @@ namespace HSMAPI.Controllers
             }
             if (employee.employeeDTO1 == null)
             {
-                return NotFound($"{employee.Response},{employee.Response}");
+                return NotFound($"{employee.Status},{employee.Response}");
             }
 
             return Ok(new {response= employee.Response,IsSuccess= employee.IsSuccess,employeeDTO= employee.employeeDTO1 });
@@ -89,7 +89,7 @@ namespace HSMAPI.Controllers
 
             if (!result.IsSuccess)
             {
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
@@ -104,6 +104,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateEmployee(string ID, EmployeeDTO employee)
         {
             
@@ -147,16 +148,15 @@ namespace HSMAPI.Controllers
                 
             }
 
-           employeeService.Mode = EmployeeService.enMode.Add;
+           employeeService.Mode = EmployeeService.enMode.Update;
             var result = await employeeService.Save(employee, ID);
 
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,
                     isSuccess = result.IsSuccess
-                    
                 });
             return Ok(new
             {
@@ -171,6 +171,7 @@ namespace HSMAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteEmployee(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -179,7 +180,7 @@ namespace HSMAPI.Controllers
             var result = await employeeService.Delete(id);
 
             if (!result.IsSuccess)
-                return BadRequest(new
+                return StatusCode(result.Status, new
                 {
                     status = result.Status,
                     response = result.Response,

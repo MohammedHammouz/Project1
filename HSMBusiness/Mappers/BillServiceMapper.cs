@@ -23,8 +23,7 @@ namespace HSMBusiness.Mappers
                     ServiceID = billServiceDTO.ServiceID,
                     BillID = billServiceDTO.BillID,
                     Quantity = billServiceDTO.Quantity,
-                    UnitPrice = billServiceDTO.UnitPrice,
-                    TotalPrice = billServiceDTO.TotalPrice
+                    UnitPrice = billServiceDTO.UnitPrice
                 };
             }
             else
@@ -35,7 +34,7 @@ namespace HSMBusiness.Mappers
                     BillID = billServiceDTO.BillID,
                     Quantity = billServiceDTO.Quantity,
                     UnitPrice = billServiceDTO.UnitPrice,
-                    TotalPrice = billServiceDTO.TotalPrice
+                    
                 };
             }
         }
