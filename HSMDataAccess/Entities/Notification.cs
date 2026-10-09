@@ -8,7 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace HSMDataAccess.Entities
 {
-    public class Notifiction
+    public class Notification
     {
         public string ID { get; set; } = null!;
 

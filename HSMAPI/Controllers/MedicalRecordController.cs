@@ -1,4 +1,5 @@
-﻿using HSMBusiness;
+﻿using Azure;
+using HSMBusiness;
 using HSMBusiness.Erorrs;
 using HSMBusiness.Pattern;
 using HSMBusiness.Services;
@@ -6,6 +7,7 @@ using HSMDataAccess.DTOs;
 using HSMDataAccess.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.NetworkInformation;
 
 namespace HSMAPI.Controllers
 {
@@ -128,7 +130,12 @@ namespace HSMAPI.Controllers
                     response = result.Response,
                     isSuccess = result.IsSuccess
                 });
-            return Ok(CreatedAtRoute("GetMedicalRecordByIdAsync", new { id = medicalRecord.ID }, medicalRecord));
+            return Ok(new
+            {
+                status = result.Status,
+                response = result.Response,
+                isSuccess = result.IsSuccess
+            });
         }
 
         [HttpDelete]
@@ -140,7 +147,7 @@ namespace HSMAPI.Controllers
         {
             var response = await new ResultPatern().GiveResponse(400, null);
             if (string.IsNullOrEmpty(id)){
-                return NotFound(new
+                return BadRequest(new
                 {
                     status = response.Status,
                     response = response.Response,

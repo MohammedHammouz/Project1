@@ -11,7 +11,7 @@
         public string PersonID { get; set; } = null!;
         public virtual Person Person { get; set; } = null!;
         public virtual  Doctor  doctor { get; set; } = null!;
-        public ICollection<Notifiction> notifiction { get; set; } = new List<Notifiction>();
+        public ICollection<Notification> notification { get; set; } = new List<Notification>();
         public ICollection<Report> report { get; set; } = new List<Report>();
         public ICollection<AuditLog> auditLog { get; set; } = new List<AuditLog>();
 

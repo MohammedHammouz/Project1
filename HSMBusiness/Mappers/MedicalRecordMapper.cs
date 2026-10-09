@@ -11,16 +11,12 @@ namespace HSMBusiness.Mappers
     public class MedicalRecordMapper
     {
         public enum enMode { Add, Update }
-
-        public MedicalRecord ToEntity(
-            MedicalRecordDTO medicalRecordDTO,
-            enMode mode = enMode.Add)
+        public MedicalRecord ToEntity(MedicalRecordDTO medicalRecordDTO,enMode mode = enMode.Add)
         {
             if (mode == enMode.Add)
             {
                 return new MedicalRecord
                 {
-                   
                     PatientID = medicalRecordDTO.PatientID,
                     Diagnosis = medicalRecordDTO.Diagnosis,
                     Treatment = medicalRecordDTO.Treatment,
@@ -33,8 +29,7 @@ namespace HSMBusiness.Mappers
             else
             {
                 return new MedicalRecord
-                {
-                    
+                {  
                     PatientID = medicalRecordDTO.PatientID,
                     Diagnosis = medicalRecordDTO.Diagnosis,
                     Treatment = medicalRecordDTO.Treatment,

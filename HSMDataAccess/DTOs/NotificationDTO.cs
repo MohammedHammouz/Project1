@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.DTOs
 {
-    public class NotifictionDTO
+    public class NotificationDTO
     {
         public string ID { get; set; } = null!;
 
@@ -24,7 +24,7 @@ namespace HSMDataAccess.DTOs
 
         public bool? DeliveryConfirmation { get; set; }
 
-        public NotifictionDTO(
+        public NotificationDTO(
             string id,
             string patientID,
             string userID,

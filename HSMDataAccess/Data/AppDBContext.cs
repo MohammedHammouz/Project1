@@ -24,7 +24,7 @@ namespace HSMDataAccess.Data
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Bill> Bills { get; set; }
         public virtual DbSet<Patient> Patients { get; set; }
-        public virtual DbSet<Notifiction> Notifictions { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<Appointment> Appointments { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
@@ -223,7 +223,7 @@ namespace HSMDataAccess.Data
                 entity.HasIndex(e => e.PersonID).IsUnique()
                 .HasDatabaseName("IX_Employees_Person");
             });
-            modelBuilder.Entity<Notifiction>(entity =>
+            modelBuilder.Entity<Notification>(entity =>
             {
                 entity.HasKey(e => e.ID);
                 entity.Property(e => e.ID)
@@ -265,12 +265,12 @@ namespace HSMDataAccess.Data
                     .HasColumnType("bit");
 
                 entity.HasOne(d => d.User)
-                 .WithMany(n => n.notifiction)
+                 .WithMany(n => n.notification)
                   .HasForeignKey(d => d.UserID)
                   .OnDelete(DeleteBehavior.Restrict);
                  
                 entity.HasOne(d => d.patient)
-                 .WithMany(n => n.notifiction)
+                 .WithMany(n => n.notification)
                   .HasForeignKey(d => d.UserID)
                   .OnDelete(DeleteBehavior.Restrict);
                 entity.ToTable(
@@ -331,7 +331,8 @@ namespace HSMDataAccess.Data
 
                 entity.Property(e => e.ExportFormat)
                     .HasColumnType("nchar(5)")
-                    .HasMaxLength(5);
+                    .HasMaxLength(5)
+                    .IsRequired();
 
                 entity.Property(e => e.Status)
                     .HasColumnType("nchar(7)")
@@ -400,6 +401,7 @@ namespace HSMDataAccess.Data
                  });
                 entity.HasIndex(e => e.DoctorID, "IX_Appointments_Doctor");
                 entity.HasIndex(e => e.PatientID, "IX_Appointments_Patient");
+                entity.HasIndex(e => e.Status, "IX_Appointments_Status");
                 entity.HasOne(d => d.patient)
                  .WithMany(n => n.appointment)
                   .HasForeignKey(d => d.PatientID)

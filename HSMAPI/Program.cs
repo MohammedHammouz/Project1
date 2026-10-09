@@ -50,8 +50,8 @@ namespace HSMAPI
             builder.Services.AddScoped<EmployeeService>();
             builder.Services.AddScoped<MedicalRecordRepository>();
             builder.Services.AddScoped<MedicalRecordService>();
-            builder.Services.AddScoped<NotifictionRepository>();
-            builder.Services.AddScoped<NotifictionService>();
+            builder.Services.AddScoped<NotificationRepository>();
+            builder.Services.AddScoped<NotificationService>();
             builder.Services.AddScoped<PatientRepository>();
             builder.Services.AddScoped<PatientService>();
             builder.Services.AddScoped<PersonRepository>();

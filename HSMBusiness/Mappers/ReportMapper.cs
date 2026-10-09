@@ -13,14 +13,14 @@ namespace HSMBusiness.Mappers
         public enum enMode { Add, Update }
 
         public Report ToEntity(
-            ReportDTO reportDTO,
+            ReportDTO reportDTO,Report report=null,
             enMode mode = enMode.Add)
         {
             if (mode == enMode.Add)
             {
                 return new Report
                 {
-                    ID = reportDTO.ID,
+                    
                     Type = reportDTO.Type,
                     GeneratedOn = reportDTO.GeneratedOn,
                     GeneratedBy = reportDTO.GeneratedBy,
@@ -36,22 +36,21 @@ namespace HSMBusiness.Mappers
             }
             else
             {
-                return new Report
-                {
-                    ID = reportDTO.ID,
-                    Type = reportDTO.Type,
-                    GeneratedOn = reportDTO.GeneratedOn,
-                    GeneratedBy = reportDTO.GeneratedBy,
-                    AppointmentCount = reportDTO.AppointmentCount,
-                    Revenue = reportDTO.Revenue,
-                    PaymentsReceived = reportDTO.PaymentsReceived,
-                    PendingPayments = reportDTO.PendingPayments,
-                    Metrics = reportDTO.Metrics,
-                    ExportFormat = reportDTO.ExportFormat,
-                    Status = reportDTO.Status,
-                    Notes = reportDTO.Notes
-                };
+
+                
+                report.Type = reportDTO.Type;
+                report.GeneratedOn = reportDTO.GeneratedOn;
+                report.GeneratedBy = reportDTO.GeneratedBy;
+                report.AppointmentCount = reportDTO.AppointmentCount;
+                report.Revenue = reportDTO.Revenue;
+                report.PaymentsReceived = reportDTO.PaymentsReceived;
+                report.PendingPayments = reportDTO.PendingPayments;
+                report.Metrics = reportDTO.Metrics;
+                report.ExportFormat = reportDTO.ExportFormat;
+                report.Status = reportDTO.Status;
+                report.Notes = reportDTO.Notes;
             }
+            return report;
         }
 
         public ReportDTO ToDTO(Report report)

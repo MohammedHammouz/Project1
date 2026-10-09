@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace HSMBusiness.Mappers
 {
-    public class NotifictionMapper
+    public class NotificationMapper
     {
         public enum enMode { Add, Update }
 
-        public Notifiction ToEntity(
-            NotifictionDTO notifictionDTO,
-            enMode mode = enMode.Add)
+        public Notification ToEntity(
+            NotificationDTO notifictionDTO,
+            enMode mode = enMode.Add,Notification notification=null)
         {
             if (mode == enMode.Add)
             {
-                return new Notifiction
+                return new Notification
                 {
-                    ID = notifictionDTO.ID,
+                    
                     PatientID = notifictionDTO.PatientID,
                     UserID = notifictionDTO.UserID,
                     Type = notifictionDTO.Type,
@@ -30,25 +30,23 @@ namespace HSMBusiness.Mappers
                     DeliveryConfirmation = notifictionDTO.DeliveryConfirmation
                 };
             }
-            else
-            {
-                return new Notifiction
-                {
-                    ID = notifictionDTO.ID,
-                    PatientID = notifictionDTO.PatientID,
-                    UserID = notifictionDTO.UserID,
-                    Type = notifictionDTO.Type,
-                    Message = notifictionDTO.Message,
-                    Status = notifictionDTO.Status,
-                    SentOn = notifictionDTO.SentOn,
-                    DeliveryConfirmation = notifictionDTO.DeliveryConfirmation
-                };
-            }
+
+
+
+            notification.PatientID = notifictionDTO.PatientID;
+            notification.UserID = notifictionDTO.UserID;
+            notification.Type = notifictionDTO.Type;
+            notification.Message = notifictionDTO.Message;
+            notification.Status = notifictionDTO.Status;
+            notification.SentOn = notifictionDTO.SentOn;
+            notification.DeliveryConfirmation = notifictionDTO.DeliveryConfirmation;
+                
+            return notification;
         }
 
-        public NotifictionDTO ToDTO(Notifiction notifiction)
+        public NotificationDTO ToDTO(Notification notifiction)
         {
-            return new NotifictionDTO
+            return new NotificationDTO
             (
                 notifiction.ID,
                 notifiction.PatientID,

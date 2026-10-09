@@ -134,7 +134,7 @@ namespace HSMAPI.Controllers
                 }
             }
 
-            appointmentService._mode = AppointmentService.enMode.Add;
+            appointmentService._mode = AppointmentService.enMode.Update;
             var result = await appointmentService.Save(appointment, ID);
 
             if (!result.IsSuccess)

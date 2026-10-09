@@ -39,6 +39,10 @@ namespace HSMBusiness.Services
             {
                 return (404,false);
             }
+            if(appointmentDTO.Status=="Reschedualed" || appointmentDTO.Status == "Cancelled")
+            {
+                return (500, false);
+            }
             if (!await doctorService.IsDoctorExist(appointmentEntity, appointmentDTO) && !await patientService.IsPatientExist(appointmentEntity, appointmentDTO))
             {
                 return (500,false);
@@ -63,30 +67,51 @@ namespace HSMBusiness.Services
             }
             return  (200, false);
         }
-        
-       
+
+        private async Task<bool>CheckUpdatedTimeEqualesCurrentTime(DateOnly CurrntDate,TimeOnly? CurrentTime, DateOnly UpdateDate, TimeOnly? UpdateTime)
+        {
+            return (CurrntDate == UpdateDate && CurrentTime == UpdateTime);
+        }
         private async Task<(int,string?,bool, Dictionary<string, string>? errors)>Update(string ID,AppointmentDTO appointmentDTO)
         {
             var CurrentAppointment = await _appointment.GetByIDAsync(ID);
-            
             var response = await resultPattern.GiveResponse(200,new Dictionary<string,string>());
+            
+            if (appointmentDTO.Status == "Scheduled")
+            {
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess, response.Errors);
+            }
+            if(await CheckUpdatedTimeEqualesCurrentTime(CurrentAppointment.Date, CurrentAppointment.Time, appointmentDTO.Date, appointmentDTO.Time))
+            {
+                response = await resultPattern.GiveResponse(400, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess, response.Errors);
+            }
             if (CurrentAppointment == null)
             {
                 response = await resultPattern.GiveResponse(200, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess,response.Errors);
             }
-
-            if(!await doctorService.IsDoctorExist(CurrentAppointment, appointmentDTO) && !await patientService.IsPatientExist(CurrentAppointment, appointmentDTO))
-            {
-                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
-                return (response.Status, response.Response, response.IsSuccess, response.Errors);
-            }
-            if (await appointmentRepository.DoctorHasAppointment(CurrentAppointment.DoctorID, CurrentAppointment.Date, CurrentAppointment.Time))
+            if(await _appointment.CountCancelledAppointment(appointmentDTO.PatientID, appointmentDTO.DoctorID, appointmentDTO.Date, appointmentDTO.Time, appointmentDTO.Status))
             {
                 response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
             }
-            if (await appointmentRepository.PatientHasAppointment(CurrentAppointment.PatientID, CurrentAppointment.Date, CurrentAppointment.Time))
+            if(!await doctorService.IsDoctorExist(CurrentAppointment, appointmentDTO) && !await patientService.IsPatientExist(CurrentAppointment, appointmentDTO) )
+            {
+                response = await resultPattern.GiveResponse(404, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess, response.Errors);
+            }
+            if (ID == CurrentAppointment.ID)
+            {
+
+            }
+            if (await appointmentRepository.DoctorHasAppointment(CurrentAppointment.DoctorID, CurrentAppointment.Date, CurrentAppointment.Time,CurrentAppointment.ID) && appointmentDTO.Status != "Cancelled")
+            {
+                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
+                return (response.Status, response.Response, response.IsSuccess, response.Errors);
+            }
+            if (await appointmentRepository.PatientHasAppointment(CurrentAppointment.PatientID, CurrentAppointment.Date, CurrentAppointment.Time, CurrentAppointment.ID) && appointmentDTO.Status != "Cancelled")
             {
                 response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
                 return (response.Status, response.Response, response.IsSuccess, response.Errors);
@@ -112,11 +137,7 @@ namespace HSMBusiness.Services
             CurrentAppointment = await new AppointmentMapper().ToEntity(appointmentDTO,AppointmentMapper.enMode.Update,CurrentAppointment);
 
             await _appointment.UpdateAsync(CurrentAppointment);
-            if (CurrentAppointment.Status == "Scheduled")
-            {
-                response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());
-                return (response.Status, response.Response, response.IsSuccess, response.Errors);
-            }
+            
             return (response.Status, response.Response, response.IsSuccess, response.Errors);
         }
         public async Task<(int Status, string? Response, bool IsSuccess, Dictionary<string, string>? errors)>Save(AppointmentDTO appointmentDTO,string ID)

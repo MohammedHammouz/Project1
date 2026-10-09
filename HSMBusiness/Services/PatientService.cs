@@ -105,7 +105,6 @@ namespace HSMBusiness.Services
         }
         public async Task<bool> IsPatientExist(string ID)
         {
-
             var patient = await GetByID(ID);
             if (patient.patientDTO1 == null)
             {
@@ -115,7 +114,6 @@ namespace HSMBusiness.Services
         }
         public async Task<bool> IsPatientExist(Appointment appointmentEntity, AppointmentDTO appointmentDTO)
         {
-
             var patient = await GetByID(appointmentEntity.PatientID);
             if (patient.patientDTO1 == null)
             {
