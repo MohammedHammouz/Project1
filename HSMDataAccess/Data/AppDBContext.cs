@@ -28,8 +28,8 @@ namespace HSMDataAccess.Data
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<Appointment> Appointments { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
-        public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
-        public virtual DbSet<MedicalService> MedicalServices { get; set; }
+        public virtual DbSet<ServiceCategories> ServiceCategories { get; set; }
+        public virtual DbSet<MedicalServices> MedicalServices { get; set; }
         public virtual DbSet<MedicalRecord> MedicalRecords { get; set; }
         public virtual DbSet<BillService> BillServices { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -518,7 +518,7 @@ namespace HSMDataAccess.Data
                   .HasForeignKey(d => d.UserID)
                   .OnDelete(DeleteBehavior.Restrict);
             });
-            modelBuilder.Entity<ServiceCategory>(entity =>
+            modelBuilder.Entity<ServiceCategories>(entity =>
             {
                 entity.ToTable("ServiceCategories");
                 entity.Property(e => e.ID)
@@ -543,7 +543,7 @@ namespace HSMDataAccess.Data
                 
 
             });
-            modelBuilder.Entity<MedicalService>(entity =>
+            modelBuilder.Entity<MedicalServices>(entity =>
             {
                 entity.HasKey(x => x.ID);
                 entity.Property(e => e.ID)

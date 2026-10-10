@@ -9,19 +9,16 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.RepositoryServices
 {
-    public class ServicesCategoryRepository 
+    public class ServicesCategoryRepository :GenericRepository<ServiceCategories>
     {
-        private AppDBContext _context;
-        public ServicesCategoryRepository(AppDBContext context)
+  
+        public ServicesCategoryRepository(AppDBContext context) : base(context)
         {
-            _context = context;
         }
-        public async Task<bool> ExistsAsync(
-           string serviceID)
+        public async Task<bool> ExistsAsync(string serviceID)
         {
-            return await _context.Set<ServiceCategory>()
-                .AnyAsync(e =>
-                    e.ID == serviceID);
+            return await _context.Set<ServiceCategories>()
+                .AnyAsync(e =>e.ID == serviceID);
         }
     }
 }

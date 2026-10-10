@@ -12,13 +12,13 @@ namespace HSMBusiness.Mappers
     {
         public enum enMode { Add, Update }
 
-        public MedicalService ToEntity(
+        public MedicalServices ToEntity(
             MedicalServiceDTO medicalServiceDTO,
             enMode mode = enMode.Add)
         {
             if (mode == enMode.Add)
             {
-                return new MedicalService
+                return new MedicalServices
                 {
                     ID = medicalServiceDTO.ID,
                     ServiceName = medicalServiceDTO.ServiceName,
@@ -30,7 +30,7 @@ namespace HSMBusiness.Mappers
             }
             else
             {
-                return new MedicalService
+                return new MedicalServices
                 {
                     ID = medicalServiceDTO.ID,
                     ServiceName = medicalServiceDTO.ServiceName,
@@ -42,7 +42,7 @@ namespace HSMBusiness.Mappers
             }
         }
 
-        public MedicalServiceDTO ToDTO(MedicalService medicalService)
+        public MedicalServiceDTO ToDTO(MedicalServices medicalService)
         {
             return new MedicalServiceDTO
             (

@@ -12,31 +12,25 @@ namespace HSMBusiness.Mappers
     {
         public enum enMode { Add, Update }
 
-        public ServiceCategory ToEntity(
-            ServicesCategoryDTO serviceCategoryDTO,
-            enMode mode = enMode.Add)
+        public ServiceCategories ToEntity(ServicesCategoryDTO serviceCategoryDTO,ServiceCategories serviceCategory=null,enMode mode = enMode.Add)
         {
             if (mode == enMode.Add)
             {
-                return new ServiceCategory
+                return new ServiceCategories
                 {
-                    ID = serviceCategoryDTO.CategoryID,
                     CategoryName = serviceCategoryDTO.CategoryName,
                     CategoryDescription = serviceCategoryDTO.CategoryDescription
                 };
             }
             else
             {
-                return new ServiceCategory
-                {
-                    ID = serviceCategoryDTO.CategoryID,
-                    CategoryName = serviceCategoryDTO.CategoryName,
-                    CategoryDescription = serviceCategoryDTO.CategoryDescription
-                };
+                serviceCategory.CategoryName = serviceCategoryDTO.CategoryName;
+                serviceCategory.CategoryDescription = serviceCategoryDTO.CategoryDescription;
             }
+            return serviceCategory;
         }
 
-        public ServicesCategoryDTO ToDTO(ServiceCategory serviceCategory)
+        public ServicesCategoryDTO ToDTO(ServiceCategories serviceCategory)
         {
             return new ServicesCategoryDTO
             (

@@ -76,7 +76,6 @@ namespace HSMBusiness.Services
         {
             var CurrentAppointment = await _appointment.GetByIDAsync(ID);
             var response = await resultPattern.GiveResponse(200,new Dictionary<string,string>());
-            
             if (appointmentDTO.Status == "Scheduled")
             {
                 response = await resultPattern.GiveResponse(500, new Dictionary<string, string>());

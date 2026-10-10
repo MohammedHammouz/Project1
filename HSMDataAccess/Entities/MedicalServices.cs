@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSMDataAccess.Entities
 {
-    public class MedicalService
+    public class MedicalServices
     {
         public string ID { get; set; } = null!;
         public string ServiceName { get; set; } = null!;
@@ -14,7 +14,7 @@ namespace HSMDataAccess.Entities
         public decimal DefaultPrice { get; set; }
         public string? Description { get; set; }
         public int? DurationMinutes { get; set; }
-        public virtual ServiceCategory serviceCategory { get; set; } = null!;
+        public virtual ServiceCategories serviceCategory { get; set; } = null!;
         public virtual ICollection<BillService> billServices { get; set; }
        = new List<BillService>();
     }

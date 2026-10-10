@@ -9,7 +9,7 @@ namespace HSMDataAccess.DTOs
 {
     public class ServicesCategoryDTO
     {
-       public string CategoryID { get; set; }
+       public string ID { get; set; }
         public string CategoryName { get; set; } = null!;
         public string? CategoryDescription { get; set; }
         public ServicesCategoryDTO()
@@ -18,7 +18,7 @@ namespace HSMDataAccess.DTOs
         }
         public ServicesCategoryDTO(string CategoryID, string CategoryName, string? CategoryDescription)
         {
-            this.CategoryID = CategoryID;
+            this.ID = CategoryID;
             this.CategoryName = CategoryName;
             this.CategoryDescription = CategoryDescription;
         }
