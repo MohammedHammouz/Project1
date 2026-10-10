@@ -1,5 +1,6 @@
 ﻿using HSMDataAccess.Data;
 using HSMDataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,11 @@ namespace HSMDataAccess.RepositoryServices
     {
         public PatientRepository(AppDBContext context) : base(context)
         {
+        }
+        public async Task<int> CountNumberOfPersonIsOne(string PersonID)
+        {
+            var count = _context.Patients.CountAsync(p => p.PersonID == PersonID);
+            return await count;
         }
     }
 }

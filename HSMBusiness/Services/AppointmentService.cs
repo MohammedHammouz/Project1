@@ -148,7 +148,7 @@ namespace HSMBusiness.Services
             if (errors.Count > 0)
             {
                 response =
-                await resultPattern.GiveResponse(400, errors);
+                await resultPattern.GiveResponse(500, errors);
                 return (
                     response.Status,
                     response.Response,

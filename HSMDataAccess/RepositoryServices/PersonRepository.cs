@@ -25,5 +25,6 @@ namespace HSMDataAccess.RepositoryServices
             var count = _context.People.CountAsync(p => p.Email == Email);
             return await count;
         }
+        
     }
 }

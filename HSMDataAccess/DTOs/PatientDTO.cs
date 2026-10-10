@@ -12,9 +12,9 @@ namespace HSMDataAccess.DTOs
         public string MedicalHistory { get; set; } = null!;
         public bool Status { get; set; } = false;
         public string PersonID { get; set; } = null!;
-        public PatientDTO(string PatientID, string MedicalHistory, bool Status, string PersonID)
+        public PatientDTO(string ID, string MedicalHistory, bool Status, string PersonID)
         {
-            this.ID = PatientID;
+            this.ID = ID;
             this.MedicalHistory = MedicalHistory;
             this.Status = Status;
             this.PersonID = PersonID;
